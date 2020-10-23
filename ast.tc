@@ -1,0 +1,72 @@
+%option lang = "C++"
+%option namespace = "Ast"
+
+%decls %{
+    #include <iostream>
+    #include <vector>
+
+    using string_t = std::string;
+
+    namespace Ast {
+        class AstNode;
+        using NodeVector = std::vector<AstNode *>;
+    }    
+%}
+
+%{
+    #include "ast.h"
+%}
+
+
+%node AstNode %abstract %typedef = {
+    %nocreate string_t code;
+}
+
+%node Section AstNode %abstract
+
+%node BlockSection Section = {
+    NodeVector nv;
+}
+
+%node HeaderH1 Section = {
+    string_t h1;
+    string_t text;
+}
+
+%node HeaderH2 Section = {
+    string_t h2;
+    string_t text;
+}
+
+%node HeaderH3 Section = {
+    string_t h3;
+    string_t text;
+}
+
+%operation %virtual string_t genLatex(AstNode *this);
+
+genLatex(BlockSection) {
+    code += "\\documentclass{article}\n\n"
+            "\\begin{document}\n";
+
+    for (const auto section : nv)
+        code += section->genLatex();
+    
+    code += "\\end{document}";
+    return code;
+}
+
+genLatex(HeaderH1) {
+    code += "\\section{" + text + "}\n";
+    return code;
+}
+
+genLatex(HeaderH2) {
+    code += "\\subsection{" + text + "}\n";
+    return code;
+}
+
+genLatex(HeaderH3) {
+    code += "\\subsubsection{" + text + "}\n";
+    return code;
+}

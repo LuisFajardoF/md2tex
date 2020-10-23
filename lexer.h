@@ -9,18 +9,21 @@
 
 #define SIZE 1024
 
-using semantic_type = Expr::Parser::semantic_type;
-using Token = Expr::Parser::token;
 
 class Lexer
 {
 public:
+    using semantic_type = Expr::Parser::semantic_type;
+    using Token = Expr::Parser::token;
+
     Lexer(std::istream& in) : context(in), lineno(1) {}
     ~Lexer() {}
+    
     int getNextToken(semantic_type *yylval);
     void yyfill(size_t n);
     std::string getText() { return std::string(context.token, context.current - context.token); }
     unsigned int getLineNo() { return lineno; }
+
 private:
     enum class FillStatus { Ok, Error, Eof };
 

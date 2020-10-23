@@ -1,18 +1,21 @@
 %require "3.3"
 %language "c++"
 %parse-param {Lexer& lexer}
+%parse-param {Ast::AstNode *&root}
 %define parse.error verbose
 %define api.value.type variant
 %define api.parser.class {Parser}
 %define api.namespace {Expr}
 
 %code requires {
+    #include "ast.h"
     class Lexer;
 }
 
 %{
 
 #include "lexer.h"
+
 #define yylex(arg) lexer.getNextToken(arg)
 
 namespace Expr {
@@ -26,28 +29,42 @@ namespace Expr {
 
 %}
 
-%token H1 "h1"
-%token H2 "h2"
-%token H3 "h3"
-
-%token Eof 0
-%token Error
-
+%token<std::string> H1 "h1"
+%token<std::string> H2 "h2"
+%token<std::string> H3 "h3"
 %token<std::string> Word "word"
-%type<std::string> expr
+
+%token Error
+%token Eof 0 "EoF"
+
+%type<Ast::AstNode *> section_list
+%type<Ast::Section *> section
 
 %%
 
-input: expr_list
+input: section_list { root = $1; }
 ;
 
-expr_list: expr_list expr { std::cout << $2 << "\n"; }
-    | %empty
+section_list: section_list section { 
+            $$ = $1;
+            dynamic_cast<Ast::BlockSection *>($$)->nv.push_back($2); 
+        }
+        | section {
+            Ast::NodeVector sections;
+            sections.push_back($1);
+            $$ = new Ast::BlockSection(sections);
+        }
 ;
 
-expr:  "h1" { $$ = "h1"; } 
-    | "h2" { $$ = "h2"; } 
-    | "h3" { $$ = "h3"; }
-    | "word" { $$ = "word"; } 
+section: "h1" "word" {
+        $$ = new Ast::HeaderH1($1, $2);
+    } 
+    | "h2" "word" {
+        $$ = new Ast::HeaderH2($1, $2); 
+    } 
+    | "h3" "word" {
+        $$ = new Ast::HeaderH3($1, $2); 
+    } 
 ;
+
 %%

@@ -27,9 +27,6 @@ int Lexer::getNextToken(semantic_type *yylval)
             re2c:define:YYFILL = "yyfill";
             re2c:define:YYFILL:naked = 0;
 
-            NUMBER = [0-9]+;
-            IDENT = [a-z_][a-z0-9_]*;
-
             "#" {
                 text = getText();
                 return Token::H1;
@@ -46,9 +43,9 @@ int Lexer::getNextToken(semantic_type *yylval)
             }
 
             [a-zA-Z0-9']+ {
-                yylval->emplace<std::string>(getText());
                 text = getText();
-                std::cout << text << '\n';
+                yylval->emplace<std::string>(text);
+                // std::cout << text << '\n';
                 return Token::Word;
             }
 
