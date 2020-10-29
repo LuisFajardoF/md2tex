@@ -1,4 +1,4 @@
-find_program(TREECC treecc
+find_program (TREECC treecc
                 PATHS /usr /usr/local /opt /opt/local $ENV{TREECC_DIR}
                 PATH_SUFFIXES treecc/bin bin
 )

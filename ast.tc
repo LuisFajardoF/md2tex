@@ -9,12 +9,14 @@
 
     namespace Ast {
         class AstNode;
-        using NodeVector = std::vector<AstNode *>;
+        using ElementVector = std::vector<AstNode *>;
     }    
 %}
 
 %{
     #include "ast.h"
+
+    string_t headcode;
 %}
 
 
@@ -22,51 +24,122 @@
     %nocreate string_t code;
 }
 
-%node Section AstNode %abstract
+%node Element AstNode %abstract
 
-%node BlockSection Section = {
-    NodeVector nv;
+%node BlockElement Element = {
+    ElementVector elements;
 }
 
-%node HeaderH1 Section = {
-    string_t h1;
-    string_t text;
+%node ParamsLevel1 Element = {
+    ElementVector elmtsl1;
 }
 
-%node HeaderH2 Section = {
-    string_t h2;
-    string_t text;
+%node ParamsLevel2 Element = {
+    ElementVector elmtsl2;
 }
 
-%node HeaderH3 Section = {
-    string_t h3;
-    string_t text;
+%node LatexClass Element = { string_t text; }
+%node Section Element = { string_t text;}
+%node SubSection Element = { string_t text; }
+%node SubSubSection Element = { string_t text; }
+%node Paragraph Element = { string_t text; }
+%node SubParagraph Element = { string_t text; }
+%node PlainText Element = { string_t text; }
+%node TitleParamL2 Element = { string_t text; }
+%node DateParamL2 Element = { string_t text; }
+%node AuthorParamL2 Element = { string_t text; }
+
+%node CoverPage Element = {
+    string_t cover;
+    ParamsLevel2* paramslevel2;
 }
+
+%node NewPage Element
 
 %operation %virtual string_t genLatex(AstNode *this);
 
-genLatex(BlockSection) {
-    code += "\\documentclass{article}\n\n"
-            "\\begin{document}\n";
-
-    for (const auto section : nv)
-        code += section->genLatex();
-    
-    code += "\\end{document}";
+genLatex(LatexClass) {
+    if (text == "article")
+        headcode += "\\documentclass{" + text + "}\n\n";
+    headcode += "\\begin{document}\n";
     return code;
 }
 
-genLatex(HeaderH1) {
+genLatex(BlockElement) {
+    for (const auto elmt : elements)
+        code += elmt->genLatex();
+    
+    code += "\\end{document}";
+    code = headcode + code;
+    return code;
+}
+
+genLatex(Section) {
     code += "\\section{" + text + "}\n";
     return code;
 }
 
-genLatex(HeaderH2) {
+genLatex(SubSection) {
     code += "\\subsection{" + text + "}\n";
     return code;
 }
 
-genLatex(HeaderH3) {
+genLatex(SubSubSection) {
     code += "\\subsubsection{" + text + "}\n";
+    return code;
+}
+
+genLatex(Paragraph) {
+    code += "\\paragraph{" + text + "}\n";
+    return code;
+}
+
+genLatex(SubParagraph) {
+    code += "\\subparagraph{" + text + "}\n";
+    return code;
+}
+
+genLatex(PlainText) {
+    code += text + " \\newline\n";
+    return code;
+}
+
+genLatex(NewPage) {
+    code += "\\newpage\n";
+    return code;
+}
+
+genLatex(ParamsLevel1) {
+    for (const auto elmt : elmtsl1)
+        code += elmt->genLatex();
+    return code;
+}
+
+genLatex(ParamsLevel2) {
+    for (const auto elmt : elmtsl2)
+        code += elmt->genLatex();
+    return code;
+}
+
+genLatex(CoverPage) {
+    code += paramslevel2->genLatex();
+    if (cover == "default")
+        code += "\\maketitle\n";
+    return code;
+}
+
+genLatex(TitleParamL2) {
+    code += "\\title{" + text + "}\n";
+    return code;
+}
+
+genLatex(DateParamL2) {
+    string_t str_date = (text == "today") ? "\\today" : text;
+    code += "\\date{" + str_date + "}\n";
+    return code;
+}
+
+genLatex(AuthorParamL2) {
+    code += "\\author{" + text + "}\n";
     return code;
 }

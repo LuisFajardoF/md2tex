@@ -27,35 +27,49 @@ int Lexer::getNextToken(semantic_type *yylval)
             re2c:define:YYFILL = "yyfill";
             re2c:define:YYFILL:naked = 0;
 
-            "#" {
+            TEXT = [a-zA-Z0-9\\'!@$%&*()_-+=|\[\]{}":;/?.>,<~`\\n];
+            TEXT_WITH_SPACES = [a-zA-Z0-9\\'!@#$%&*()_-+=|\[\]{}":;/?.>,<~` ];
+            TEXT_PARAM = [a-zA-Z0-9];
+
+            "#"     { return Token::H1; }
+            "##"    { return Token::H2; }
+            "###"   { return Token::H3; }
+            "####"  { return Token::H4; }
+            "#####" { return Token::H5; }
+            "---"   { return Token::NewPage; }
+            "!--"   { return Token::OpenParam; }
+            "--!"   { return Token::CloseParam; }
+            ":"     { return Token::Colon; }
+            "{"     { return Token::OpenKey; }
+            "}"     { return Token::CloseKey; }
+            "class" { return Token::Class;}
+            "cover" { return Token::Cover; }
+            "title" { return Token::Title; }
+            "author" { return Token::Author; }
+            "date"  { return Token::Date; }
+            "default" { 
                 text = getText();
-                return Token::H1;
+                yylval->emplace<std::string>(text); 
+                return Token::Default; 
             }
+            
+            TEXT    { goto block_text; }
 
-            "##" {
-                text = getText();
-                return Token::H2;
-            }
-
-            "###" {
-                text = getText();
-                return Token::H3;
-            }
-
-            [a-zA-Z0-9']+ {
-                text = getText();
-                yylval->emplace<std::string>(text);
-                // std::cout << text << '\n';
-                return Token::Word;
-            }
-
-            [ \t] {continue;}
-            "\n" {lineno++; continue;}
-
-            '\x00' { return Token::Eof; }
-
-            * { return TkError(); }
+            [ \t]   { continue; }
+            "\n"    { lineno++; continue; }
+            '\x00'  { return Token::Eof; }
+            *       { return TkError(); }
         */
+
+        block_text:
+            /*!re2c
+                TEXT_WITH_SPACES* {
+                    text = getText();
+                    yylval->emplace<std::string>(text);
+                    return Token::Text;
+                }
+                "\n" { continue; }
+            */
     }
 }
 

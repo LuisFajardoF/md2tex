@@ -8,8 +8,6 @@ find_package_handle_standard_args(RE2C DEFAULT_MSG RE2C)
 
 mark_as_advanced(RE2C)
 
-if(RE2C_FOUND)
-
-else(RE2C_FOUND)
+if(NOT RE2C_FOUND)
     message(FATAL_ERROR "re2c was not found.")
-endif(RE2C_FOUND)
+endif()

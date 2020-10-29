@@ -32,39 +32,112 @@ namespace Expr {
 %token<std::string> H1 "h1"
 %token<std::string> H2 "h2"
 %token<std::string> H3 "h3"
-%token<std::string> Word "word"
-
+%token<std::string> H4 "h4"
+%token<std::string> H5 "h5"
+%token<std::string> Text "text"
+%token<std::string> Default "default"
+%token<std::string> NewPage "newpage"
+%token<std::string> OpenParam "!--"
+%token<std::string> CloseParam "--!"
+%token<std::string> Colon ":"
+%token<std::string> OpenKey "{"
+%token<std::string> CloseKey "}"
+%token<std::string> Cover "cover"
+%token<std::string> Class "class"
+%token<std::string> Title "title"
+%token<std::string> Author "author"
+%token<std::string> Date "date"
 %token Error
 %token Eof 0 "EoF"
 
-%type<Ast::AstNode *> section_list
-%type<Ast::Section *> section
+%type<Ast::AstNode *> element_list
+%type<Ast::Element *> element
+%type<Ast::ParamsLevel1 *> param_level1_list
+%type<Ast::ParamsLevel2 *> param_level2_list
+%type<Ast::AstNode *> param_level1
+%type<Ast::AstNode *> param_level2
 
 %%
 
-input: section_list { root = $1; }
+input: element_list { root = $1; }
 ;
 
-section_list: section_list section { 
+element_list: element_list element { 
             $$ = $1;
-            dynamic_cast<Ast::BlockSection *>($$)->nv.push_back($2); 
+            dynamic_cast<Ast::BlockElement *>($$)->elements.push_back($2); 
         }
-        | section {
-            Ast::NodeVector sections;
-            sections.push_back($1);
-            $$ = new Ast::BlockSection(sections);
+        | element {
+            Ast::ElementVector elements;
+            elements.push_back($1);
+            $$ = new Ast::BlockElement(elements);
         }
 ;
 
-section: "h1" "word" {
-        $$ = new Ast::HeaderH1($1, $2);
+element: "h1" "text" {
+        $$ = new Ast::Section($2);
     } 
-    | "h2" "word" {
-        $$ = new Ast::HeaderH2($1, $2); 
+    | "h2" "text" {
+        $$ = new Ast::SubSection($2); 
     } 
-    | "h3" "word" {
-        $$ = new Ast::HeaderH3($1, $2); 
+    | "h3" "text" {
+        $$ = new Ast::SubSubSection($2); 
     } 
+    | "h4" "text" {
+        $$ = new Ast::Paragraph($2); 
+    } 
+    | "h5" "text" {
+        $$ = new Ast::SubParagraph($2); 
+    }
+    | "text" {
+        $$ = new Ast::PlainText($1);
+    }
+    | "newpage" {
+        $$ = new Ast::NewPage();
+    }
+    | "!--" param_level1_list "--!" {
+        $$ = $2;
+    }
+;
+
+param_level1_list: param_level1_list param_level1 {
+        $$ = $1;
+        dynamic_cast<Ast::ParamsLevel1 *>($$)->elmtsl1.push_back($2);
+    }
+    | param_level1 {
+        Ast::ElementVector elmtsl1;
+        elmtsl1.push_back($1);
+        $$ = new Ast::ParamsLevel1(elmtsl1);
+    }
+;
+
+param_level1: "cover" ":" "default" "{" param_level2_list "}" {
+        $$ = new Ast::CoverPage($3, $5);
+    }
+    | "class" ":" "text" {
+        $$ = new Ast::LatexClass($3);
+    }
+;
+
+param_level2_list: param_level2_list param_level2 {
+        $$ = $1;
+        dynamic_cast<Ast::ParamsLevel2 *>($$)->elmtsl2.push_back($2);
+    }
+    | param_level2 {
+        Ast::ElementVector elmtsl2;
+        elmtsl2.push_back($1);
+        $$ = new Ast::ParamsLevel2(elmtsl2);
+    } 
+;
+
+param_level2: "title" ":" "text" {
+        $$ = new Ast::TitleParamL2($3);
+    }
+    | "date" ":" "text" {
+        $$ = new Ast::DateParamL2($3);
+    }
+    | "author" ":" "text" {
+        $$ = new Ast::AuthorParamL2($3);
+    }
 ;
 
 %%
