@@ -55,3 +55,44 @@ make
 ```
 
 Si no se genera ningun error, su archivo PDF estará dentro de la carpeta `/build/`.
+
+## Lo que el interprete hace hasta ahora
+
+En el archivo `input.txt`:
+
+```
+!--
+    cover : default {
+        title: MyDocument
+        date: today
+        author: Pink Panter
+    }
+    class: article
+--!
+
+---
+
+# Section 1 author 
+## special chars: {} :;< >!¡``"@$%&*()-_=+^ ~ 
+## \ []' .,?¿Hola?
+## Subsection 1
+### SubSubSection1
+#### Paragraph1
+#### Paragraph2
+##### Subparagraph1
+#####   ## Subparagraph2
+### SubSubSection1
+# Section 2
+Other plain text
+This is plain text #
+hola:{};< >!¡``"@$%&*()-_=+^ ~ \ []' 
+#### Section 3
+.,?¿Hola?
+---
+
+# Page 2
+
+---
+
+## Page 3
+```

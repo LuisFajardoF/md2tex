@@ -1,33 +1,34 @@
 !--
-    cover: default {
-        title: My First Document!
+    cover : default {
+        title: MyDocument
         date: today
         author: Luis Fajardo
     }
     class: article
 --!
 
-# Section
-Hello World!
-
-## Subsection
-Structuring a document is easy! cover
-Structuring a document is easy in a second paragraph!
 ---
 
-### Subsubsection
-More text.
+# Section 1 author 
+## special chars: {} :;< >!¡``"@$%&*()-_=+^ ~ 
+## \ []' .,?¿Hola?
+## Subsection 1
+### SubSubSection1
+#### Paragraph1
+#### Paragraph2
+##### Subparagraph1
+#####   ## Subparagraph2
+### SubSubSection1
+# Section 2
+Other plain text
+This is plain text #
+hola:{};< >!¡``"@$%&*()-_=+^ ~ \ []' 
+#### Section 3
+.,?¿Hola?
 ---
 
-#### Paragraph
-Some more text.
+# Page 2
+
 ---
 
-##### Subparagraph
-Even more text.
----
-
-# Another section
-I just returned from the greatest summer vacation! It was so fantastic, I never wanted it to end. I spent eight days in Paris, France. My best friends, Henry and Steve, went with me. We had a beautiful hotel room in the Latin Quarter, and it wasnt even expensive. We had a balcony with a wonderful view.
-We visited many famous tourist places. My favorite was the Louvre, a well-known museum. I was always interested in art, so that was a special treat for me. The museum is so huge, you could spend weeks there. Henry got tired walking around the museum and said -Enough! I need to take a break and rest.-
-We took lots of breaks and sat in cafes along the river Seine. The French food we ate was delicious. The wines were tasty, too. Steves favorite part of the vacation was the hotel breakfast. He said he would be happy if he could eat croissants like those forever. We had so much fun that were already talking about our next vacation!
+## Page 3

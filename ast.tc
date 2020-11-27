@@ -17,6 +17,7 @@
     #include "ast.h"
 
     string_t headcode;
+    bool latexclass_exist = false;
 %}
 
 
@@ -59,23 +60,24 @@
 %operation %virtual string_t genLatex(AstNode *this);
 
 genLatex(LatexClass) {
-    if (text == "article")
-        headcode += "\\documentclass{" + text + "}\n\n";
+    latexclass_exist = !latexclass_exist;
+    headcode += "\\documentclass{" + text + "}\n\n";
     headcode += "\\begin{document}\n";
     return code;
 }
 
 genLatex(BlockElement) {
+    string_t singlehead = "\\documentclass{article}\n\n\\begin{document}\n";
     for (const auto elmt : elements)
         code += elmt->genLatex();
-    
     code += "\\end{document}";
-    code = headcode + code;
+    code = latexclass_exist? headcode + code : singlehead + code;
     return code;
 }
 
 genLatex(Section) {
     code += "\\section{" + text + "}\n";
+    
     return code;
 }
 
@@ -100,7 +102,7 @@ genLatex(SubParagraph) {
 }
 
 genLatex(PlainText) {
-    code += text + " \\newline\n";
+    code += text + "\n";
     return code;
 }
 

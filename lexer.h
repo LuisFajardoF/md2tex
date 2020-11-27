@@ -3,50 +3,38 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <cstring>
 #include "parser.h"
 
-#define SIZE 1024
-
+using yyscan_t = void*;
+using semantic_type = Expr::Parser::semantic_type;
+using Token = Expr::Parser::token;
 
 class Lexer
 {
 public:
-    using semantic_type = Expr::Parser::semantic_type;
-    using Token = Expr::Parser::token;
+    Lexer(std::istream &in);
+    ~Lexer();
 
-    Lexer(std::istream& in) : context(in), lineno(1) {}
-    ~Lexer() {}
-    
-    int getNextToken(semantic_type *yylval);
-    void yyfill(size_t n);
-    std::string getText() { return std::string(context.token, context.current - context.token); }
-    unsigned int getLineNo() { return lineno; }
+    int getNextToken(semantic_type *yylval)
+    {
+        return _getNextToken(*yylval, scanner);
+    }
+
+    std::string getText() { return text; }
+    int getLineNo();
 
 private:
-    enum class FillStatus { Ok, Error, Eof };
+    int _getNextToken(semantic_type& yylval, yyscan_t yyscanner);
+    int makeToken(const char *txt, int len, int tk);
 
-    struct Context {
-        std::vector<char> buffer;
-        char* limit;
-        char* current;
-        char* marker;
-        char* token;
-        bool eof;
-        std::istream& in;
-
-        Context(std::istream& in);
-        ~Context() {}
-        FillStatus fill(size_t need);
-    };
-
-    int TkEof() { return Token::Eof; }
-    int TkError() { return Token::Error; }
-
-    Context context;
+    std::istream &in;
     std::string text;
-    unsigned int lineno;
+    yyscan_t scanner;
 };
+
+namespace AuxFuncs 
+{
+    void specialLatexCommands(char character, std::string& text, int& offset);
+}
 
 #endif

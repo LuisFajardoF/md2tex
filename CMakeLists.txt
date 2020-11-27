@@ -6,14 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(RE2C REQUIRED)
 find_package(TREECC REQUIRED)
 
-# Run re2c to generate the lexer
+# Run flex to generate the lexer
 add_custom_command (
   OUTPUT lexer.cpp
-  COMMAND ${RE2C} -o lexer.cpp ${PROJECT_SOURCE_DIR}/lexer.re
-  MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/lexer.re
+  COMMAND flex -o lexer.cpp ${PROJECT_SOURCE_DIR}/lexer.l
+  MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/lexer.l
 )
 
 # Run bison to generate the parser
