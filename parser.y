@@ -47,7 +47,7 @@ namespace Expr {
 %token<std::string> Title "title"
 %token<std::string> Author "author"
 %token<std::string> Date "date"
-%token Error
+%token<std::string> Error
 %token Eof 0 "EoF"
 
 %type<Ast::AstNode *> element_list
@@ -96,6 +96,9 @@ element: "h1" "text" {
     }
     | "!--" param_level1_list "--!" {
         $$ = $2;
+    }
+    | Error {
+        error("invalid character");
     }
 ;
 

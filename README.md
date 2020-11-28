@@ -8,7 +8,7 @@ reconocer un elemento de sintaxis de Markdown y construya un elemento recíproco
 
 ## Herramientas de Desarrollo
 - cmake 3.13.4 (o superior)
-- re2c 2.0.3
+- flex 2.6.4 (o superior)
 - bison 3.3.2 (o superior)
 - treecc 0.3.11
 
@@ -96,3 +96,52 @@ hola:{};< >!¡``"@$%&*()-_=+^ ~ \ []'
 
 ## Page 3
 ```
+
+En el archivo `input2.txt`:
+
+```
+'a'e'i'o'u ~n ~a ~b ^a ^c ^d
+**bold** *italic* *abc*
+plain text
+*italic*
+
+_other italic_ ( _ ) {guion bajo}
+__other bold__ __abc__ _abx_ ~~avc~~ 
+
+# My Title with **bold** letter
+#### **This paragraph is bold** 
+**This text is bold** 
+
+# My Title with __bold__ letter
+#### __This paragraph is bold__ 
+__This text is bold__ 
+
+# My Title with *italic* letter
+#### *This paragraph is italic* 
+*This text is italic*
+
+# My Title with _italic_ letter
+#### _This paragraph is italic_ 
+_This text is italic_
+
+# My Title with ~~underline~~ letter
+#### ~~This paragraph is underline~~ 
+~~This text is underline~~ 
+
+```
+
+## Errores
+
+#### Error en tiempo de ejecucion
+```
+terminate called after throwing an instance of 'std::out_of_range'
+  what():  basic_string::replace: __pos (which is 32) > this->size() (which is 31)
+```
+Este error se genera cuando se encuentra un elemento de marcado negrita o subrayado al final de una cadena.
+
+#### Causa
+En el analisis lexico se deberan hacer validaciones para cuando un elemnento de enfasis
+llega a fin de cadena.
+
+**La unica manera de saltar este error es escribiendo mas texto despues de un elemento de enfasis o bien escribiendo un espacio al final de la cadena**
+
