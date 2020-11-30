@@ -54,4 +54,5 @@ void createLatexFolders()
 {
     mkdir("../latex", S_IRWXU);
     mkdir("../latex/tex", S_IRWXU);
+    mkdir("../latex/images", S_IRWXU);
 }

@@ -1,34 +1,44 @@
-!--
-    cover : default {
-        title: MyDocument
-        date: today
-        author: Luis Fajardo
-    }
-    class: article
---!
+# Section 1 {My First Section} 
 
----
+special chars: { } : ; < > ! ¡ ``" @ $ % & * ( ) - _ = + ^ 
+special chars: \ []' .,?¿Hola?
+~~reserved words:~~ __logo, institution, title, subject, author, cover, report, date, place__ 
 
-# Section 1 author 
-## special chars: {} :;< >!¡``"@$%&*()-_=+^ ~ 
-## \ []' .,?¿Hola?
 ## Subsection 1
-### SubSubSection1
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+incididunt ut labore et dolore magna aliqua. Augue eget arcu dictum varius duis at. 
+Elementum curabitur vitae nunc sed velit dignissim sodales. Neque convallis a cras 
+semper auctor neque vitae tempus. Rhoncus urna neque viverra justo nec. Velit euismod 
+in pellentesque massa placerat duis ultricies.  
+
+Tempor nec feugiat nisl pretium fusce id velit ut. Habitant morbi tristique senectus et. 
+Egestas sed sed risus pretium quam. Scelerisque mauris pellentesque pulvinar pellentesque 
+habitant morbi. Curabitur gravida arcu ac tortor dignissim. Ac turpis egestas maecenas pharetra.  
+
+Lectus quam id leo in vitae turpis massa sed elementum. Leo duis ut diam quam nulla porttitor massa 
+id neque. Tellus integer feugiat scelerisque varius morbi enim nunc faucibus a. In cursus turpis massa 
+tincidunt dui ut ornare lectus sit. Ac tortor dignissim convallis aenean et tortor at risus viverra.
+
 #### Paragraph1
+Quam quisque id diam vel quam elementum pulvinar etiam. Sit amet volutpat consequat mauris nunc congue nisi.
+
 #### Paragraph2
+unc congue nisi. Sodales ut eu sem integer vitae justo.
+
 ##### Subparagraph1
-#####   ## Subparagraph2
+Lectus urna duis convallis convallis tellus id interdum velit laoreet. Massa id neque aliquam vestibulum 
+morbi blandit cursus. Dolor sed viverra ipsum nunc aliquet bibendum enim facilisis gravida.
+
+#####   ## Subparagraph2 ##
+Elementum integer enim neque volutpat ac tincidunt vitae semper quis. Vivamus at augue eget arcu dictum. 
+Arcu non odio euismod lacinia.
+
 ### SubSubSection1
+
 # Section 2
 Other plain text
 This is plain text #
-hola:{};< >!¡``"@$%&*()-_=+^ ~ \ []' 
-#### Section 3
-.,?¿Hola?
----
 
-# Page 2
-
----
-
-## Page 3
+#### Paragraph3
+hola:{};< >!¡``"@$%&*()-_=+^ \ []' .,?¿Hola?

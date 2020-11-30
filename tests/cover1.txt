@@ -1,0 +1,33 @@
+!--
+    cover: default {
+        title: Gesti'on de Memoria Din'amica
+        author: Luis E. Fajardo & 2nd Author
+        date: today
+    }
+    enumerate: yes
+--!
+
+# Primera Secci'on
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Elit at 
+imperdiet dui accumsan sit amet nulla facilisi. Urna duis convallis 
+convallis tellus id interdum velit laoreet. Mi eget mauris pharetra 
+et ultrices neque ornare aenean euismod. Nulla aliquet enim tortor at. 
+Purus sit amet volutpat consequat mauris. Risus ultricies tristique 
+nulla aliquet. Faucibus nisl tincidunt eget nullam non nisi est sit amet. 
+Mi bibendum neque egestas congue quisque egestas diam in. Lectus proin nibh 
+nisl condimentum id venenatis. Egestas sed sed risus pretium quam vulputate 
+dignissim suspendisse.
+
+
+# Segunda Secci'on
+
+Dis parturient montes nascetur ridiculus. Condimentum vitae sapien pellentesque 
+habitant morbi tristique senectus. Bibendum est ultricies integer quis auctor elit 
+sed vulputate mi. Ac tortor dignissim convallis aenean et tortor at risus. At urna 
+condimentum mattis pellentesque id nibh tortor. Adipiscing commodo elit at imperdiet 
+dui accumsan sit. Tortor aliquam nulla facilisi cras fermentum odio. Nunc id cursus 
+metus aliquam. Commodo odio aenean sed adipiscing diam donec adipiscing tristique risus. 
+Nec ultrices dui sapien eget mi proin sed libero. Proin sed libero enim sed faucibus turpis. 
+Non tellus orci ac auctor. Nunc scelerisque viverra mauris in aliquam.

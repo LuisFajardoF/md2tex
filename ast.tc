@@ -6,6 +6,7 @@
     #include <vector>
 
     using string_t = std::string;
+    using vector_str = std::vector<string_t>;
 
     namespace Ast {
         class AstNode;
@@ -17,7 +18,10 @@
     #include "ast.h"
 
     string_t headcode;
+    string_t package_section;       // for \usepackage{}
     bool latexclass_exist = false;
+    bool is_enumerate = false;
+    bool is_reportcover = false;
 %}
 
 
@@ -40,6 +44,7 @@
 }
 
 %node LatexClass Element = { string_t text; }
+%node Enumerate Element = { string_t text; }
 %node Section Element = { string_t text;}
 %node SubSection Element = { string_t text; }
 %node SubSubSection Element = { string_t text; }
@@ -49,8 +54,17 @@
 %node TitleParamL2 Element = { string_t text; }
 %node DateParamL2 Element = { string_t text; }
 %node AuthorParamL2 Element = { string_t text; }
+%node InstitutionParamL2 Element = { string_t text; }
+%node SubjectParamL2 Element = { string_t text; }
+%node PlaceParamL2 Element = { string_t text; }
+%node LogoParamL2 Element = { string_t text; }
 
-%node CoverPage Element = {
+%node DefaultCoverPage Element = {
+    string_t cover;
+    ParamsLevel2* paramslevel2;
+}
+
+%node ReportCoverPage Element = {
     string_t cover;
     ParamsLevel2* paramslevel2;
 }
@@ -62,32 +76,52 @@
 genLatex(LatexClass) {
     latexclass_exist = !latexclass_exist;
     headcode += "\\documentclass{" + text + "}\n\n";
-    headcode += "\\begin{document}\n";
+    return code;
+}
+
+genLatex(Enumerate) {
+    if (text[0] == 'y' && text[1] == 'e' && text[2] == 's')
+        is_enumerate = true;
+    else if (text != "no")
+        std::cout << "The " << 
+                "\033[0;33m" << "enumeration " << "\033[0m" <<
+                "parameter will take the default value" << std::endl;
     return code;
 }
 
 genLatex(BlockElement) {
-    string_t singlehead = "\\documentclass{article}\n\n\\begin{document}\n";
+    string_t singlehead = "\\documentclass{article}\n\n";
+    string_t begin_document = "\\begin{document}\n";
     for (const auto elmt : elements)
         code += elmt->genLatex();
     code += "\\end{document}";
-    code = latexclass_exist? headcode + code : singlehead + code;
+    code = latexclass_exist? headcode + package_section + begin_document + code 
+                    : singlehead + package_section + begin_document + code;
     return code;
 }
 
 genLatex(Section) {
-    code += "\\section{" + text + "}\n";
+    if (is_enumerate)
+        code += "\\section{" + text + "}\n";
+    else 
+        code += "\\section*{" + text + "}\n";
     
     return code;
 }
 
 genLatex(SubSection) {
-    code += "\\subsection{" + text + "}\n";
+    if (is_enumerate)
+        code += "\\subsection{" + text + "}\n";
+    else
+        code += "\\subsection*{" + text + "}\n";
     return code;
 }
 
 genLatex(SubSubSection) {
-    code += "\\subsubsection{" + text + "}\n";
+    if (is_enumerate)
+        code += "\\subsubsection{" + text + "}\n";
+    else
+        code += "\\subsubsection*{" + text + "}\n";
     return code;
 }
 
@@ -123,25 +157,108 @@ genLatex(ParamsLevel2) {
     return code;
 }
 
-genLatex(CoverPage) {
+genLatex(DefaultCoverPage) {
     code += paramslevel2->genLatex();
+    
     if (cover == "default")
         code += "\\maketitle\n";
     return code;
 }
 
+genLatex(ReportCoverPage) {
+    is_reportcover = true;
+    code += "\t\\begin{titlepage}\n\t\t\\centering\n";
+    code += paramslevel2->genLatex();
+    code += "\t\\end{titlepage}\n";
+    return code;
+}
+
 genLatex(TitleParamL2) {
-    code += "\\title{" + text + "}\n";
+    if (is_reportcover)
+        code += "\t\t\\Huge " + text + " \\par\n" +
+                "\t\t\\vfill\n";
+    else
+        code += "\\title{" + text + "}\n";
     return code;
 }
 
 genLatex(DateParamL2) {
     string_t str_date = (text == "today") ? "\\today" : text;
-    code += "\\date{" + str_date + "}\n";
+    if (is_reportcover)
+        code += "\t\t\\Large " + str_date + " \\par\n"
+                "\t\t\\vfill\n";
+    else
+        code += "\\date{" + str_date + "}\n";
     return code;
 }
 
 genLatex(AuthorParamL2) {
-    code += "\\author{" + text + "}\n";
+    string_t temp_text = "";
+    vector_str authors;
+    int is_coauthor; 
+    
+    if (is_reportcover) {
+        is_coauthor = text.find_first_of("&");
+        
+        if (is_coauthor != -1) {
+            code += "\t\t\\large Autores \\par\n";
+            for (auto offset = 0; text[offset]; offset++) {
+                if (text[offset] == '&') {
+                    authors.push_back(temp_text);
+                    temp_text = "";
+                } else if (text[offset] == '\\') {
+                } else if (text[offset+1] == '\0') {
+                    temp_text.push_back(text[offset]);
+                    authors.push_back(temp_text);
+                } else 
+                    temp_text.push_back(text[offset]);
+            }
+            for (auto i = 0; i < authors.size(); i++)
+                code += "\t\t\\Large " + authors[i] + " \\par\n";
+            code += "\t\t\\vfill\n";
+        } 
+        else {
+            code += "\t\t\\large Autor \\par\n\t\t\\Large " +
+                    text + " \\par\n\t\t\\vfill\n";
+        }
+    } else {
+        for (auto offset = 0; text[offset]; offset++) {
+            if (text[offset] == '&') {
+                temp_text += "\\and";
+            } else if (text[offset] == '\\') {
+            } else
+                temp_text.push_back(text[offset]);
+        }
+        code += "\\author{" + temp_text + "}\n";
+    }
+    return code;
+}
+
+genLatex(InstitutionParamL2) {
+    if (is_reportcover)
+        code += "\t\t\\scshape\\LARGE " + text + " \\par\n" +
+                "\t\t\\vfill\n";
+    return code;
+}
+
+genLatex(SubjectParamL2) {
+    if (is_reportcover)
+        code += "\t\t\\LARGE " + text + " \\par\n" +
+                "\t\t\\vfill\n";
+    return code;
+}
+
+genLatex(PlaceParamL2) {
+    if (is_reportcover)
+        code += "\t\t\\large " + text + " \\par\n"
+                "\t\t\\vfill\n";
+    return code;
+}
+
+genLatex(LogoParamL2) {
+    if (is_reportcover) {
+        package_section += "\\usepackage{graphicx}\n";
+        code += "\t\t\\includegraphics[width=0.2\\textwidth]{../images/"+ text +"}\\par\n";
+    }
     return code;
 }

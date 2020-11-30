@@ -35,6 +35,7 @@ namespace Expr {
 %token<std::string> H4 "h4"
 %token<std::string> H5 "h5"
 %token<std::string> Text "text"
+%token<std::string> ImageText "imageText"
 %token<std::string> Default "default"
 %token<std::string> NewPage "newpage"
 %token<std::string> OpenParam "!--"
@@ -47,6 +48,12 @@ namespace Expr {
 %token<std::string> Title "title"
 %token<std::string> Author "author"
 %token<std::string> Date "date"
+%token<std::string> Report "report"
+%token<std::string> Institution "institution"
+%token<std::string> Subject "subject"
+%token<std::string> Place "place"
+%token<std::string> Logo "logo"
+%token<std::string> Enumerate "enumerate"
 %token<std::string> Error
 %token Eof 0 "EoF"
 
@@ -114,10 +121,16 @@ param_level1_list: param_level1_list param_level1 {
 ;
 
 param_level1: "cover" ":" "default" "{" param_level2_list "}" {
-        $$ = new Ast::CoverPage($3, $5);
+        $$ = new Ast::DefaultCoverPage($3, $5);
+    }
+    | "cover" ":" "report" "{" param_level2_list "}" {
+        $$ = new Ast::ReportCoverPage($3, $5);
     }
     | "class" ":" "text" {
         $$ = new Ast::LatexClass($3);
+    }
+    | "enumerate" ":" "text" {
+        $$ = new Ast::Enumerate($3);
     }
 ;
 
@@ -140,6 +153,18 @@ param_level2: "title" ":" "text" {
     }
     | "author" ":" "text" {
         $$ = new Ast::AuthorParamL2($3);
+    }
+    | "institution" ":" "text" {
+        $$ = new Ast::InstitutionParamL2($3);
+    }
+    | "subject" ":" "text" {
+        $$ = new Ast::SubjectParamL2($3);
+    }
+    | "place" ":" "text" {
+        $$ = new Ast::PlaceParamL2($3);
+    }
+    | "logo" ":" "imageText" {
+        $$ = new Ast::LogoParamL2($3);
     }
 ;
 

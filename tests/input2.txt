@@ -1,4 +1,3 @@
-'a'e'i'o'u ~n ~a ~b ^a ^c ^d
 **bold** *italic* *abc*
 plain text
 *italic*

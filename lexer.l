@@ -12,10 +12,12 @@
         } while(false)
     
     bool is_param = false;
+    bool is_image = false; // activa la regla [a-zA-Z0-9_.-/] para imagenes 
 %}
 
-%x TEXT
-%x PARAMS
+%x TEXT 
+%x PARAMS 
+%x IMAGETEXT
 
 %%
 
@@ -59,8 +61,13 @@
 }
 
 ":" {
-    if (is_param)
+    if (is_param) {
+        if (is_image) {
+            is_image = false;
+            BEGIN(IMAGETEXT);
+        }
         return makeToken(yytext, yyleng, Token::Colon);
+    }
     BEGIN(TEXT);
 }
 
@@ -114,20 +121,81 @@
     BEGIN(TEXT);
 }
 
+"report" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Report);
+    }
+    BEGIN(TEXT);
+}
+
+"enumerate" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Enumerate);
+    BEGIN(TEXT);
+}
+
+"institution" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Institution);
+    BEGIN(TEXT);
+}
+
+"subject" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Subject);
+    BEGIN(TEXT);
+}
+
+"place" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Place);
+    BEGIN(TEXT);
+}
+
+"logo" {
+    if (is_param) {
+        is_image = true;
+        return makeToken(yytext, yyleng, Token::Logo);
+    }
+    BEGIN(TEXT);
+}
+
+
 [a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿?] {
     yylval.emplace<std::string>(yytext, yyleng);
     if (yytext[0] != ' ')
         unput(yytext[0]);
+
     BEGIN(TEXT);
 }
 
-<TEXT>[a-zA-Z0-9 #{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿?]* {
+<IMAGETEXT>[a-zA-Z0-9_./-]{-}[ ]+ {
+    yylval.emplace<std::string>(yytext, yyleng);
+    BEGIN(INITIAL);
+    return makeToken(yytext, yyleng, Token::ImageText);
+}
+
+<IMAGETEXT>. { /* default rule IMAGETEXT */ }
+
+<TEXT>[a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿? ]* {
     text = std::string(yytext, yyleng);
     bool is_emphasis = false;
+    std::string special_cmd;
 
     auto offset = 0;
     while(text[offset]) 
     {
+        // validacion temporal para saltos de linea
+        if (text[offset] == ' ' 
+            && text[offset+1] == ' '
+            && text[offset+2] == '\0') {
+                special_cmd = "\\newline\n";
+                text.insert(offset, special_cmd);
+                offset += special_cmd.length();
+                // text.erase(offset, 2);
+            }
+
 
         AuxFuncs::emphasisCommands(text, offset, is_emphasis);
             
