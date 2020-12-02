@@ -4,7 +4,8 @@
         author: Luis E. Fajardo & 2nd Author
         date: today
     }
-    enumerate: yes
+    numbered: yes
+    pagenumbering: gobble
 --!
 
 # Primera Secci'on
@@ -20,6 +21,7 @@ Mi bibendum neque egestas congue quisque egestas diam in. Lectus proin nibh
 nisl condimentum id venenatis. Egestas sed sed risus pretium quam vulputate 
 dignissim suspendisse.
 
+---
 
 # Segunda Secci'on
 

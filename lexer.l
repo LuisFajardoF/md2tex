@@ -129,9 +129,69 @@
     BEGIN(TEXT);
 }
 
-"enumerate" {
+"numbered" {
     if (is_param)
-        return makeToken(yytext, yyleng, Token::Enumerate);
+        return makeToken(yytext, yyleng, Token::Numbered);
+    BEGIN(TEXT);
+}
+
+"pagenumbering" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::PageNumbering);
+    BEGIN(TEXT);
+}
+
+"gobble" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Gobble);
+    }
+    BEGIN(TEXT);
+}
+
+"arabic" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Arabic);
+    }
+    BEGIN(TEXT);
+}
+
+"roman" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Roman);
+    }
+    BEGIN(TEXT);
+}
+
+"Roman" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Roman);
+    }
+    BEGIN(TEXT);
+}
+
+"alph" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Alph);
+    }
+    BEGIN(TEXT);
+}
+
+"Alph" {
+    if (is_param) {
+        yylval.emplace<std::string>(yytext, yyleng);
+        return makeToken(yytext, yyleng, Token::Alph);
+    }
+    BEGIN(TEXT);
+}
+
+"set" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Set);
     BEGIN(TEXT);
 }
 

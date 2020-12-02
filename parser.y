@@ -53,7 +53,13 @@ namespace Expr {
 %token<std::string> Subject "subject"
 %token<std::string> Place "place"
 %token<std::string> Logo "logo"
-%token<std::string> Enumerate "enumerate"
+%token<std::string> Numbered "numbered"
+%token<std::string> PageNumbering "pagenumbering"
+%token<std::string> Gobble "gobble"
+%token<std::string> Arabic "arabic"
+%token<std::string> Alph "alph"
+%token<std::string> Roman "roman"
+%token<std::string> Set "set"
 %token<std::string> Error
 %token Eof 0 "EoF"
 
@@ -63,6 +69,7 @@ namespace Expr {
 %type<Ast::ParamsLevel2 *> param_level2_list
 %type<Ast::AstNode *> param_level1
 %type<Ast::AstNode *> param_level2
+%type<std::string> param_numbering
 
 %%
 
@@ -129,9 +136,21 @@ param_level1: "cover" ":" "default" "{" param_level2_list "}" {
     | "class" ":" "text" {
         $$ = new Ast::LatexClass($3);
     }
-    | "enumerate" ":" "text" {
-        $$ = new Ast::Enumerate($3);
+    | "numbered" ":" "text" {
+        $$ = new Ast::Numbered($3);
     }
+    | "pagenumbering" ":" param_numbering "{" "set" ":" "text" "}" {
+        $$ = new Ast::PageNumberingAsSet($3, $7);
+    }
+    | "pagenumbering" ":" param_numbering {
+        $$ = new Ast::PageNumbering($3);
+    }
+;
+
+param_numbering: "arabic" { $$ = $1; }
+    | "roman" { $$ = $1; }
+    | "alph" { $$ = $1; }
+    | "gobble" { $$ = $1; }
 ;
 
 param_level2_list: param_level2_list param_level2 {
