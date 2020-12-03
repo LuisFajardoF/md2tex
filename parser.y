@@ -36,6 +36,7 @@ namespace Expr {
 %token<std::string> H5 "h5"
 %token<std::string> Text "text"
 %token<std::string> ImageText "imageText"
+%token<std::string> FigureLabel "figureLabel"
 %token<std::string> Default "default"
 %token<std::string> NewPage "newpage"
 %token<std::string> OpenParam "!--"
@@ -60,6 +61,13 @@ namespace Expr {
 %token<std::string> Alph "alph"
 %token<std::string> Roman "roman"
 %token<std::string> Set "set"
+%token<std::string> Figure "figure"
+%token<std::string> OpenBracket "["
+%token<std::string> CloseBracket "]"
+%token<std::string> OpenPar "("
+%token<std::string> ClosePar ")"
+%token<std::string> Comma ","
+%token<std::string> Semicolon ";"
 %token<std::string> Error
 %token Eof 0 "EoF"
 
@@ -69,6 +77,7 @@ namespace Expr {
 %type<Ast::ParamsLevel2 *> param_level2_list
 %type<Ast::AstNode *> param_level1
 %type<Ast::AstNode *> param_level2
+%type<Ast::FigureParams *> figure_param
 %type<std::string> param_numbering
 
 %%
@@ -104,6 +113,9 @@ element: "h1" "text" {
     }
     | "text" {
         $$ = new Ast::PlainText($1);
+    }
+    | "figure" "[" figure_param "]" "(" "figureLabel" ")" {
+        $$ = new Ast::Figure($3, $6);
     }
     | "newpage" {
         $$ = new Ast::NewPage();
@@ -147,10 +159,21 @@ param_level1: "cover" ":" "default" "{" param_level2_list "}" {
     }
 ;
 
-param_numbering: "arabic" { $$ = $1; }
-    | "roman" { $$ = $1; }
-    | "alph" { $$ = $1; }
-    | "gobble" { $$ = $1; }
+param_numbering: "arabic"
+    | "roman"
+    | "alph"
+    | "gobble"
+;
+
+figure_param: figure_param "," "figureLabel" {
+        $$ = $1;
+        dynamic_cast<Ast::FigureParams *>($$)->figureParams.push_back($3);
+    }
+    | "figureLabel" {
+        Ast::StringVector params;
+        params.push_back($1);
+        $$ = new Ast::FigureParams(params);
+    }
 ;
 
 param_level2_list: param_level2_list param_level2 {

@@ -12,12 +12,14 @@
         } while(false)
     
     bool is_param = false;
-    bool is_image = false; // activa la regla [a-zA-Z0-9_.-/] para imagenes 
+    bool is_image_path = false; // activa la regla [a-zA-Z0-9_.-/] para el path de imagenes 
 %}
 
 %x TEXT 
 %x PARAMS 
-%x IMAGETEXT
+%x LOGOTEXT
+%x LABELTEXT
+%x FIGURE
 
 %%
 
@@ -62,9 +64,9 @@
 
 ":" {
     if (is_param) {
-        if (is_image) {
-            is_image = false;
-            BEGIN(IMAGETEXT);
+        if (is_image_path) {
+            is_image_path = false;
+            BEGIN(LOGOTEXT);
         }
         return makeToken(yytext, yyleng, Token::Colon);
     }
@@ -215,12 +217,48 @@
 
 "logo" {
     if (is_param) {
-        is_image = true;
+        is_image_path = true;
         return makeToken(yytext, yyleng, Token::Logo);
     }
     BEGIN(TEXT);
 }
 
+"!["[a-zA-Z0-9 ,;.=]+"]("[a-zA-Z0-9_./ -]+")" {
+    auto offset = strlen(yytext);
+
+    while(yytext[offset] != '!')
+        unput(yytext[--offset]);
+    BEGIN(FIGURE);
+    return makeToken(yytext, yyleng, Token::Figure);
+}
+
+<FIGURE>"[" {
+    return makeToken(yytext, yyleng, Token::OpenBracket);
+}
+
+<FIGURE>[a-zA-Z0-9_./= -]+ {
+    yylval.emplace<std::string>(yytext, yyleng);
+    return makeToken(yytext, yyleng, Token::FigureLabel);
+}
+
+<FIGURE>"," {
+    return makeToken(yytext, yyleng, Token::Comma);
+}
+
+<FIGURE>"]" {
+    return makeToken(yytext, yyleng, Token::CloseBracket);
+}
+
+<FIGURE>"(" {
+    return makeToken(yytext, yyleng, Token::OpenPar);
+}
+
+<FIGURE>")" {
+    BEGIN(INITIAL);
+    return makeToken(yytext, yyleng, Token::ClosePar);
+}
+
+<FIGURE>. { /* default rule FIGURE */ }
 
 [a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿?] {
     yylval.emplace<std::string>(yytext, yyleng);
@@ -230,13 +268,13 @@
     BEGIN(TEXT);
 }
 
-<IMAGETEXT>[a-zA-Z0-9_./-]{-}[ ]+ {
+<LOGOTEXT>[a-zA-Z0-9_./-]{-}[ ]+ {
     yylval.emplace<std::string>(yytext, yyleng);
     BEGIN(INITIAL);
     return makeToken(yytext, yyleng, Token::ImageText);
 }
 
-<IMAGETEXT>. { /* default rule IMAGETEXT */ }
+<LOGOTEXT>. { /* default rule LOGOTEXT */ }
 
 <TEXT>[a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿? ]* {
     text = std::string(yytext, yyleng);
@@ -255,7 +293,6 @@
                 offset += special_cmd.length();
                 // text.erase(offset, 2);
             }
-
 
         AuxFuncs::emphasisCommands(text, offset, is_emphasis);
             
@@ -351,7 +388,6 @@ bool AuxFuncs::emphasisCommands(std::string& text, int& offset, bool& is_emphasi
 {
     std::string special_cmd;
     int state = 0;
-
 
     if (!is_emphasis) 
     {

@@ -1,6 +1,7 @@
 #ifndef _GEN_LATEX_H_
 #define _GEN_LATEX_H_
 
+#include <iostream> //debug
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -25,6 +26,7 @@ namespace Code
     std::string centering();
     std::string pagenumbering(std::string& text);
     std::string pagenumberingAsSet(std::string& text, std::string& page_number);
+    std::string figureEnvironment(std::vector<std::string>& params, std::string& path);
 
     // report cover
     std::string reportCoverLogo(std::string& text);
@@ -36,9 +38,14 @@ namespace Code
     std::string reportCoverAuthor(std::string& text);
 
     // default cover
+    std::string defaultCoverLogo(std::string& text);
     std::string defaultCoverTitle(std::string& text);
     std::string defaultCoverAuthor(std::string& text);
     std::string defaultCoverDate(std::string& text);
+
+    namespace Logic {
+        void figurePosition(std::string param, std::string& position);
+    };
 };
 
 

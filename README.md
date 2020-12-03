@@ -230,6 +230,7 @@ En el archivo `pagenumbering.txt`:
 ```
 !--
     cover: default {
+        logo: logo_unitec.jpg
         title: Programaci'on Orientada a Objetos (POO)
         author: Luis E. Fajardo & 2nd Author & 3rd Author
         date: today
@@ -243,6 +244,9 @@ En el archivo `pagenumbering.txt`:
 Faucibus vitae aliquet nec ullamcorper sit amet risus. Dictum at tempor commodo 
 ullamcorper a lacus. Egestas sed tempus urna et pharetra pharetra massa. Cursus 
 sit amet dictum sit amet justo donec enim diam. Tellus orci ac auctor augue. 
+
+![Gasherbrum, 10cm, 8cm, hto](mountain.jpg)
+
 ---
 
 # Segunda Secci'on
@@ -251,6 +255,7 @@ aliquet enim tortor at auctor. Rhoncus dolor purus non enim praesent elementum
 facilisis leo. Viverra vitae congue eu consequat ac felis donec et odio. 
 Ac feugiat sed lectus vestibulum mattis ullamcorper. At urna condimentum mattis 
 pellentesque id nibh tortor id. Mauris rhoncus aenean vel elit.
+![My Organization, 3cm, 3cm, ho](mylogo.png)
 ---
 !--
     pagenumbering: Roman {

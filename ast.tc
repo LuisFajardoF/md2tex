@@ -10,6 +10,7 @@
     namespace Ast {
         class AstNode;
         using ElementVector = std::vector<AstNode *>;
+        using StringVector = std::vector<string_t>;
     }    
 %}
 
@@ -44,6 +45,10 @@
     ElementVector elmtsl2;
 }
 
+%node FigureParams Element = {
+    StringVector figureParams;
+}
+
 %node LatexClass Element = { string_t text; }
 %node Numbered Element = { string_t text; }
 %node PageNumbering Element = { string_t text; }
@@ -60,6 +65,11 @@
 %node SubjectParamL2 Element = { string_t text; }
 %node PlaceParamL2 Element = { string_t text; }
 %node LogoParamL2 Element = { string_t text; }
+
+%node Figure Element = {
+    FigureParams* params;
+    string_t path;
+}
 
 %node PageNumberingAsSet Element = {
     string_t text;
@@ -156,6 +166,10 @@ genLatex(ParamsLevel2) {
     return code;
 }
 
+genLatex(FigureParams) {
+    return code;
+}
+
 genLatex(DefaultCoverPage) {
     code += paramslevel2->genLatex();
     
@@ -211,9 +225,14 @@ genLatex(PlaceParamL2) {
 }
 
 genLatex(LogoParamL2) {
-    if (is_reportcover) {
-        package.add(Package::Graphicx);
+    package.add(Package::Graphicx);
+    if (is_reportcover)
         return Code::reportCoverLogo(text);
-    }
+    return Code::defaultCoverLogo(text);
+}
+
+genLatex(Figure) {
+    package.add(Package::Graphicx);
+    return Code::figureEnvironment(params->figureParams, path);
     return code;
 }

@@ -107,7 +107,15 @@ std::string Code::reportCoverSubject(std::string& text)
 
 std::string Code::reportCoverLogo(std::string& text)
 {
-    return "\t\t\\includegraphics[width=0.2\\textwidth]{../images/"+ text +"}\\par\n";
+    return "\t\t\\includegraphics[width=0.2\\textwidth]{../images/" + text + "}\\par\n";
+}
+
+std::string Code::defaultCoverLogo(std::string& text)
+{
+    return "\t\\begin{figure}[!t]\n"
+            "\t\t\\centering\n"
+            "\t\t\\includegraphics[width=0.2\\textwidth]{../images/" + text + "}\n"
+            "\t\\end{figure}\n";
 }
 
 std::string Code::reportCoverPlace(std::string& text)
@@ -184,6 +192,50 @@ std::string Code::pagenumberingAsSet(std::string& text, std::string& page_number
             "\t\\setcounter{page}{" + page_number + "}\n";
 }
 
+std::string Code::figureEnvironment(std::vector<std::string>& params, std::string& path)
+{
+    std::string begin_fig = "\n\t\\begin{figure}"; 
+    std::string end_fig = "\t\\end{figure}\n"; 
+    std::string caption = "\t\t\\caption{" + params[0] + "}\n"; 
+    std::string centering = "\t\t\\centering\n"; 
+    std::string position; 
+    int params_size = params.size();
+    
+    if (params_size == 1)
+        return begin_fig + "[!h]\n" + centering +
+                "\t\t\\includegraphics[width=4cm, height=4cm]"
+                "{../images/" + path + "}\n" + caption + end_fig;
+
+    Code::Logic::figurePosition(params[3], position);
+
+    if (params_size == 5)
+        return begin_fig + "[" + position + "]\n" + centering +
+                "\t\t\\includegraphics[width=" + params[1] + ", height=" + params[2] +
+                ", angle=" + params[4] + "]{../images/" + path + "}\n" +
+                caption + end_fig;
+
+    return  begin_fig + "[" + position + "]\n" + centering +
+            "\t\t\\includegraphics[width=" + params[1] + ", height=" + params[2] + "]"
+            "{../images/" + path + "}\n" + caption + end_fig;
+}
+
+// Code::Logic namespace
+void Code::Logic::figurePosition(std::string param, std::string& position)
+{
+    for(auto it = 0; param[it]; it++) {
+        switch(param[it]) {
+            case 'o': position.push_back('!'); break;
+            case 'h': 
+            case 'p': 
+            case 'b': 
+            case 't': 
+                position.push_back(param[it]);
+                break;
+            default: break;
+        }
+    }
+}
+
 // Package namespace
 void Package::add(unsigned int pack)
 {
@@ -200,6 +252,9 @@ std::string Package::packsCode()
 
     for (auto it : packs)
         code += "\\usepackage{" + it + "}\n";
+    
+    if (code != "") 
+        code += "\n";
     return code;
 }
 
