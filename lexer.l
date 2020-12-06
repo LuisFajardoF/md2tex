@@ -223,7 +223,7 @@
     BEGIN(TEXT);
 }
 
-"!["[a-zA-Z0-9 ,;.=]+"]("[a-zA-Z0-9_./ -]+")" {
+"!["[a-zA-Z0-9 ,;.={}\n]+"]("[a-zA-Z0-9_./ -,\n]+")" {
     auto offset = strlen(yytext);
 
     while(yytext[offset] != '!')
@@ -236,17 +236,25 @@
     return makeToken(yytext, yyleng, Token::OpenBracket);
 }
 
-<FIGURE>[a-zA-Z0-9_./= -]+ {
+<FIGURE>"]" {
+    return makeToken(yytext, yyleng, Token::CloseBracket);
+}
+
+<FIGURE>[a-zA-Z0-9_./= \n-]+ {
     yylval.emplace<std::string>(yytext, yyleng);
     return makeToken(yytext, yyleng, Token::FigureLabel);
 }
 
-<FIGURE>"," {
-    return makeToken(yytext, yyleng, Token::Comma);
+<FIGURE>"{" {
+    return makeToken(yytext, yyleng, Token::OpenKey);
 }
 
-<FIGURE>"]" {
-    return makeToken(yytext, yyleng, Token::CloseBracket);
+<FIGURE>"}" {
+    return makeToken(yytext, yyleng, Token::CloseKey);
+}
+
+<FIGURE>"," {
+    return makeToken(yytext, yyleng, Token::Comma);
 }
 
 <FIGURE>"(" {
@@ -256,6 +264,10 @@
 <FIGURE>")" {
     BEGIN(INITIAL);
     return makeToken(yytext, yyleng, Token::ClosePar);
+}
+
+<FIGURE>";" {
+    return makeToken(yytext, yyleng, Token::Semicolon);
 }
 
 <FIGURE>. { /* default rule FIGURE */ }

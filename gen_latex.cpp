@@ -76,9 +76,34 @@ std::string Code::endTitlePage()
     return "\t\\end{titlepage}\n";
 }
 
+std::string Code::beginFigure()
+{
+    return "\n\t\\begin{figure}";
+}
+
+std::string Code::endFigure()
+{
+    return "\t\\end{figure}\n";
+}
+
+std::string Code::beginSubfigure()
+{
+    return "\t\t\\begin{subfigure}";
+}
+
+std::string Code::endSubfigure()
+{
+    return "\t\t\\end{subfigure}\n";
+}
+
 std::string Code::centering()
 {
     return "\t\t\\centering\n";
+}
+
+std::string Code::caption(std::string& caption)
+{
+    return "\t\t\\caption{" + caption + "}\n";
 }
 
 std::string Code::reportCoverTitle(std::string& text)
@@ -192,48 +217,103 @@ std::string Code::pagenumberingAsSet(std::string& text, std::string& page_number
             "\t\\setcounter{page}{" + page_number + "}\n";
 }
 
-std::string Code::figureEnvironment(std::vector<std::string>& params, std::string& path)
+std::string Code::singleFigureEnvironment(std::vector<std::string>& params, std::string& path)
 {
-    std::string begin_fig = "\n\t\\begin{figure}"; 
-    std::string end_fig = "\t\\end{figure}\n"; 
-    std::string caption = "\t\t\\caption{" + params[0] + "}\n"; 
-    std::string centering = "\t\t\\centering\n"; 
-    std::string position; 
     int params_size = params.size();
+    std::string fig_position; 
+    std::string fig_params;
     
     if (params_size == 1)
-        return begin_fig + "[!h]\n" + centering +
+        return Code::beginFigure() + "[!h]\n" + Code::centering() +
                 "\t\t\\includegraphics[width=4cm, height=4cm]"
-                "{../images/" + path + "}\n" + caption + end_fig;
+                "{../images/" + Code::Logic::noSpacesStr(path) + "}\n" + 
+                Code::caption(params[0]) + Code::endFigure();
 
-    Code::Logic::figurePosition(params[3], position);
+    fig_position = Code::Logic::figurePosition(params[params_size-1]);
+    fig_params = Code::Logic::includeGraphicsParams(params, true);
 
-    if (params_size == 5)
-        return begin_fig + "[" + position + "]\n" + centering +
-                "\t\t\\includegraphics[width=" + params[1] + ", height=" + params[2] +
-                ", angle=" + params[4] + "]{../images/" + path + "}\n" +
-                caption + end_fig;
+    return Code::beginFigure() + "[" + fig_position + "]\n" + Code::centering() +
+            "\t\t\\includegraphics[" + fig_params + "]{../images/" +
+            Code::Logic::noSpacesStr(path) + "}\n" + Code::caption(params[0]) + 
+            Code::endFigure();
+}
 
-    return  begin_fig + "[" + position + "]\n" + centering +
-            "\t\t\\includegraphics[width=" + params[1] + ", height=" + params[2] + "]"
-            "{../images/" + path + "}\n" + caption + end_fig;
+std::string Code::multipleFigureEnvironment(std::vector<std::string>& params, std::string& path)
+{
+    int params_size = params.size();
+    std::string fig_params;
+
+    if (params_size == 1)
+        return "\t\t\\subfigure[" + params[0] + "]{\n\t\t\t\\includegraphics[width=4cm, height=4cm]{"
+            "../images/" + Code::Logic::noSpacesStr(path) + "}\n\t\t}\n";
+    
+    fig_params = Code::Logic::includeGraphicsParams(params, false);
+    
+    return "\t\t\\subfigure[" + params[0] + "]{\n\t\t\t\\includegraphics[" +
+        fig_params + "]{../images/" + Code::Logic::noSpacesStr(path) + "}\n\t\t}\n";
 }
 
 // Code::Logic namespace
-void Code::Logic::figurePosition(std::string param, std::string& position)
+std::string Code::Logic::figurePosition(std::string param)
 {
+    std::string fig_position = "";
+
     for(auto it = 0; param[it]; it++) {
         switch(param[it]) {
-            case 'o': position.push_back('!'); break;
+            case 'o': fig_position.push_back('!'); break;
+            case 'b': 
             case 'h': 
             case 'p': 
-            case 'b': 
             case 't': 
-                position.push_back(param[it]);
+                fig_position.push_back(param[it]);
                 break;
             default: break;
         }
     }
+
+    return fig_position;
+}
+
+std::string Code::Logic::includeGraphicsParams(std::vector<std::string>& params, bool singleFigure)
+{
+    std::string str_param = "";
+    auto params_size = singleFigure? params.size()-1 : params.size();
+
+    for (auto i = 1; i < params_size; i++) {
+        char *token = std::strtok(const_cast<char*>(params[i].c_str()), "= \t\n");
+        
+        while (token != NULL) 
+        {
+            if (!std::strncmp(token, "w", 1))
+                str_param += "width=";
+            else if (!std::strncmp(token, "h", 1)) 
+                str_param += "height=";
+            else if (!std::strncmp(token, "s", 1))
+                str_param += "scale=";
+            else if (!std::strncmp(token, "a", 1))
+                str_param += "angle=";
+            else {
+                str_param += token;
+                if (i < params_size-1)
+                    str_param += ", ";
+            }
+
+            token = std::strtok(NULL, "= \t\n");
+        } 
+        free(token);
+    }
+    return str_param;
+}
+
+std::string Code::Logic::noSpacesStr(std::string& path)
+{
+    path.erase(std::remove_if(path.begin(), path.end(), 
+            [](char &ch) { 
+                return std::isspace<char>(ch, std::locale::classic());
+            }),
+            path.end());
+    
+    return path;
 }
 
 // Package namespace

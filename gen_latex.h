@@ -4,6 +4,7 @@
 #include <iostream> //debug
 #include <algorithm>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <unordered_map>
 
@@ -23,10 +24,16 @@ namespace Code
     std::string maketitle();
     std::string beginTitlePage();
     std::string endTitlePage();
+    std::string beginFigure();
+    std::string endFigure();
+    std::string beginSubfigure();
+    std::string endSubfigure();
     std::string centering();
+    std::string caption(std::string& text);
     std::string pagenumbering(std::string& text);
     std::string pagenumberingAsSet(std::string& text, std::string& page_number);
-    std::string figureEnvironment(std::vector<std::string>& params, std::string& path);
+    std::string singleFigureEnvironment(std::vector<std::string>& params, std::string& path);
+    std::string multipleFigureEnvironment(std::vector<std::string>& params, std::string& path);
 
     // report cover
     std::string reportCoverLogo(std::string& text);
@@ -44,16 +51,18 @@ namespace Code
     std::string defaultCoverDate(std::string& text);
 
     namespace Logic {
-        void figurePosition(std::string param, std::string& position);
+        std::string figurePosition(std::string param);
+        std::string noSpacesStr(std::string& path);
+        std::string includeGraphicsParams(std::vector<std::string>& params, bool singleFigure);
     };
 };
-
 
 struct Package
 {
     enum
     {
         Graphicx,
+        Subfigure,
     };
 
     Package() {}
@@ -64,6 +73,7 @@ struct Package
     // packages
     PackInfo packInfo = {
         {Graphicx, "graphicx"},
+        {Subfigure, "subfigure"},
     };
 
     void add(unsigned int pack);

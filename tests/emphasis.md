@@ -1,9 +1,3 @@
-**bold** *italic* *abc*
-plain text
-*italic*
-
-_other italic_ ( _ ) {guion bajo}
-__other bold__ __abc__ _abx_ ~~avc~~ 
 
 # My Title with **bold** letter
 #### **This paragraph is bold** 
@@ -24,3 +18,4 @@ _This text is italic_
 # My Title with ~~underline~~ letter
 #### ~~This paragraph is underline~~ 
 ~~This text is underline~~ 
+

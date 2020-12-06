@@ -78,6 +78,8 @@ namespace Expr {
 %type<Ast::AstNode *> param_level1
 %type<Ast::AstNode *> param_level2
 %type<Ast::FigureParams *> figure_param
+%type<Ast::MultipleFiguresParams *> multiple_figures_param
+%type<Ast::MultipleFiguresLabel *> multiple_figures_label
 %type<std::string> param_numbering
 
 %%
@@ -114,7 +116,13 @@ element: "h1" "text" {
     | "text" {
         $$ = new Ast::PlainText($1);
     }
-    | "figure" "[" figure_param "]" "(" "figureLabel" ")" {
+    | "figure" "[" "{" "figureLabel" "," "figureLabel" "}" "," multiple_figures_param "]" "(" multiple_figures_label ")" {
+        $$ = new Ast::MultipleFigures($4, $6, $9, $12);
+    }
+    | "figure" "[" "{" "figureLabel" "}" "," multiple_figures_param "]" "(" multiple_figures_label ")" {
+        $$ = new Ast::MultipleFigures($4, "", $7, $10);
+    }
+    | "figure" "[" multiple_figures_param "]" "(" multiple_figures_label ")" {
         $$ = new Ast::Figure($3, $6);
     }
     | "newpage" {
@@ -163,6 +171,28 @@ param_numbering: "arabic"
     | "roman"
     | "alph"
     | "gobble"
+;
+
+multiple_figures_param: multiple_figures_param ";" figure_param {
+        $$ = $1;
+        dynamic_cast<Ast::MultipleFiguresParams *>($$)->mfv.push_back($3);
+    }
+    | figure_param {
+        Ast::MultipleFiguresVector mfv;
+        mfv.push_back($1);
+        $$ = new Ast::MultipleFiguresParams(mfv);
+    }
+;
+
+multiple_figures_label: multiple_figures_label "," "figureLabel" {
+        $$ = $1;
+        dynamic_cast<Ast::MultipleFiguresLabel *>($$)->mfl.push_back($3);
+    }
+    | "figureLabel" {
+        Ast::StringVector mfl;
+        mfl.push_back($1);
+        $$ = new Ast::MultipleFiguresLabel(mfl);
+    }
 ;
 
 figure_param: figure_param "," "figureLabel" {

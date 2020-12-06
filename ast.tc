@@ -9,8 +9,11 @@
 
     namespace Ast {
         class AstNode;
+        class FigureParams;
+
         using ElementVector = std::vector<AstNode *>;
         using StringVector = std::vector<string_t>;
+        using MultipleFiguresVector = std::vector<FigureParams *>;
     }    
 %}
 
@@ -49,6 +52,14 @@
     StringVector figureParams;
 }
 
+%node MultipleFiguresParams Element = {
+    MultipleFiguresVector mfv; 
+}
+
+%node MultipleFiguresLabel Element = {
+    StringVector mfl;
+}
+
 %node LatexClass Element = { string_t text; }
 %node Numbered Element = { string_t text; }
 %node PageNumbering Element = { string_t text; }
@@ -67,8 +78,15 @@
 %node LogoParamL2 Element = { string_t text; }
 
 %node Figure Element = {
-    FigureParams* params;
-    string_t path;
+    MultipleFiguresParams* multipleFiguresParams;
+    MultipleFiguresLabel* multipleFiguresLabel;
+}
+
+%node MultipleFigures Element = {
+    string_t caption;
+    string_t fig_position;
+    MultipleFiguresParams* multipleFiguresParams;
+    MultipleFiguresLabel* multipleFiguresLabel;
 }
 
 %node PageNumberingAsSet Element = {
@@ -167,6 +185,19 @@ genLatex(ParamsLevel2) {
 }
 
 genLatex(FigureParams) {
+    /* no hace nada
+    todo se hace en la clase Figure */
+    return code;
+}
+
+genLatex(MultipleFiguresParams) {
+    /* no hace nada
+    todo se hace en la clase Figure */
+    return code;
+}
+
+genLatex(MultipleFiguresLabel) {
+    /* no hace nada todo se hace en la clase Figure */
     return code;
 }
 
@@ -233,6 +264,38 @@ genLatex(LogoParamL2) {
 
 genLatex(Figure) {
     package.add(Package::Graphicx);
-    return Code::figureEnvironment(params->figureParams, path);
+    MultipleFiguresVector mfv = multipleFiguresParams->mfv;
+    StringVector mfl = multipleFiguresLabel->mfl;
+
+    if (mfv.size() == 1)
+        return Code::singleFigureEnvironment(mfv[0]->figureParams, mfl[0]);
+    else {
+        package.add(Package::Subfigure);
+        code += Code::beginFigure();
+        code += Code::centering();
+
+        for (auto i = 0; i < mfv.size(); i++)
+            code += Code::multipleFigureEnvironment(mfv[i]->figureParams, mfl[i]);
+        
+        code += Code::endFigure();
+    }
+    return code;
+}
+
+genLatex(MultipleFigures) {
+    package.add(Package::Graphicx);
+    package.add(Package::Subfigure);
+    MultipleFiguresVector mfv = multipleFiguresParams->mfv;
+    StringVector mfl = multipleFiguresLabel->mfl;
+
+    code += Code::beginFigure();
+    code += (fig_position == "")? "[ht!]\n": "[" + Code::Logic::figurePosition(fig_position) + "]\n";
+    code += Code::centering();
+
+    for (auto i = 0; i < mfv.size(); i++)
+        code += Code::multipleFigureEnvironment(mfv[i]->figureParams, mfl[i]);
+
+    code += Code::caption(caption);
+    code += Code::endFigure();
     return code;
 }
