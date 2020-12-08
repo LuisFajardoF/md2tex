@@ -31,6 +31,7 @@ namespace Code
     std::string centering();
     std::string caption(std::string& text);
     std::string pagenumbering(std::string& text);
+    std::string toc(std::string& text);
     std::string pagenumberingAsSet(std::string& text, std::string& page_number);
     std::string singleFigureEnvironment(std::vector<std::string>& params, std::string& path);
     std::string multipleFigureEnvironment(std::vector<std::string>& params, std::string& path);
@@ -53,6 +54,7 @@ namespace Code
     namespace Logic {
         std::string figurePosition(std::string param);
         std::string noSpacesStr(std::string& path);
+        std::string trim(const std::string& str);
         std::string includeGraphicsParams(std::vector<std::string>& params, bool singleFigure);
     };
 };

@@ -46,6 +46,7 @@ namespace Expr {
 %token<std::string> CloseKey "}"
 %token<std::string> Cover "cover"
 %token<std::string> Class "class"
+%token<std::string> ToC "toc"
 %token<std::string> Title "title"
 %token<std::string> Author "author"
 %token<std::string> Date "date"
@@ -116,13 +117,13 @@ element: "h1" "text" {
     | "text" {
         $$ = new Ast::PlainText($1);
     }
-    | "figure" "[" "{" "figureLabel" "," "figureLabel" "}" "," multiple_figures_param "]" "(" multiple_figures_label ")" {
+    | "figure" "[" "{" "figureLabel" "," "figureLabel" "}" ":" multiple_figures_param "]" "(" multiple_figures_label ")" {
         $$ = new Ast::MultipleFigures($4, $6, $9, $12);
     }
-    | "figure" "[" "{" "figureLabel" "}" "," multiple_figures_param "]" "(" multiple_figures_label ")" {
+    | "figure" "[" "{" "figureLabel" "}" ":" multiple_figures_param "]" "(" multiple_figures_label ")" {
         $$ = new Ast::MultipleFigures($4, "", $7, $10);
     }
-    | "figure" "[" multiple_figures_param "]" "(" multiple_figures_label ")" {
+    | "figure" "[" figure_param "]" "(" "figureLabel" ")" {
         $$ = new Ast::Figure($3, $6);
     }
     | "newpage" {
@@ -164,6 +165,9 @@ param_level1: "cover" ":" "default" "{" param_level2_list "}" {
     }
     | "pagenumbering" ":" param_numbering {
         $$ = new Ast::PageNumbering($3);
+    }
+    | "toc" ":" "text" {
+        $$ = new Ast::ToC($3);
     }
 ;
 

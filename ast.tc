@@ -76,10 +76,11 @@
 %node SubjectParamL2 Element = { string_t text; }
 %node PlaceParamL2 Element = { string_t text; }
 %node LogoParamL2 Element = { string_t text; }
+%node ToC Element = { string_t text; }
 
 %node Figure Element = {
-    MultipleFiguresParams* multipleFiguresParams;
-    MultipleFiguresLabel* multipleFiguresLabel;
+    FigureParams* params;
+    string_t fig_name;
 }
 
 %node MultipleFigures Element = {
@@ -115,7 +116,8 @@ genLatex(LatexClass) {
 }
 
 genLatex(Numbered) {
-    if (text[0] == 'y' && text[1] == 'e' && text[2] == 's')
+    text = Code::Logic::trim(text);
+    if (text.compare("yes") == 0)
         is_numbered = true;
     else if (text != "no")
         std::cout << "The " << 
@@ -127,6 +129,13 @@ genLatex(Numbered) {
 genLatex(PageNumbering) {
     // gobble, arabic, roman, Roman, alph, Alph
     return Code::pagenumbering(text);
+}
+
+genLatex(ToC) {
+    text = Code::Logic::trim(text);
+    if (text.compare("yes") == 0)
+        return Code::toc(text);
+    return code;
 }
 
 genLatex(PageNumberingAsSet) {
@@ -264,22 +273,7 @@ genLatex(LogoParamL2) {
 
 genLatex(Figure) {
     package.add(Package::Graphicx);
-    MultipleFiguresVector mfv = multipleFiguresParams->mfv;
-    StringVector mfl = multipleFiguresLabel->mfl;
-
-    if (mfv.size() == 1)
-        return Code::singleFigureEnvironment(mfv[0]->figureParams, mfl[0]);
-    else {
-        package.add(Package::Subfigure);
-        code += Code::beginFigure();
-        code += Code::centering();
-
-        for (auto i = 0; i < mfv.size(); i++)
-            code += Code::multipleFigureEnvironment(mfv[i]->figureParams, mfl[i]);
-        
-        code += Code::endFigure();
-    }
-    return code;
+    return Code::singleFigureEnvironment(params->figureParams, fig_name);
 }
 
 genLatex(MultipleFigures) {

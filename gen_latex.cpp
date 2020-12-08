@@ -211,6 +211,11 @@ std::string Code::pagenumbering(std::string& text)
     return "\t\\pagenumbering{" + text + "}\n";
 }
 
+std::string Code::toc(std::string& text)
+{
+    return "\t\\tableofcontents\n";
+}
+
 std::string Code::pagenumberingAsSet(std::string& text, std::string& page_number)
 {
     return "\t\\pagenumbering{" + text + "}\n"
@@ -314,6 +319,18 @@ std::string Code::Logic::noSpacesStr(std::string& path)
             path.end());
     
     return path;
+}
+
+std::string Code::Logic::trim(const std::string& str)
+{
+    auto begin = str.begin();
+    while (begin != str.end() && std::isspace(*begin))
+        begin++;
+
+    auto end = str.end()-1;
+    while (std::distance(begin, end) > 0 && std::isspace(*end))
+        end--;
+    return std::string(begin, end+1);
 }
 
 // Package namespace

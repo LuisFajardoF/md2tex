@@ -1,3 +1,8 @@
+!--
+    numbered: yes
+    toc : yes
+--!
+
 # Section 1 {My First Section} 
 
 special chars: { } : ; < > ! ¡ ``" @ $ % & * ( ) - _ = + ^ 

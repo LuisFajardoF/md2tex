@@ -143,6 +143,12 @@
     BEGIN(TEXT);
 }
 
+"toc" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::ToC);
+    BEGIN(TEXT);
+}
+
 "gobble" {
     if (is_param) {
         yylval.emplace<std::string>(yytext, yyleng);
@@ -223,7 +229,7 @@
     BEGIN(TEXT);
 }
 
-"!["[a-zA-Z0-9 ,;.={}\n]+"]("[a-zA-Z0-9_./ -,\n]+")" {
+"!["[a-zA-Z0-9 ,;.:={}\n]+"]("[a-zA-Z0-9_.:/ -,\n]+")" {
     auto offset = strlen(yytext);
 
     while(yytext[offset] != '!')
@@ -268,6 +274,10 @@
 
 <FIGURE>";" {
     return makeToken(yytext, yyleng, Token::Semicolon);
+}
+
+<FIGURE>":" {
+    return makeToken(yytext, yyleng, Token::Colon);
 }
 
 <FIGURE>. { /* default rule FIGURE */ }
