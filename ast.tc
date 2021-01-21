@@ -27,7 +27,6 @@
     bool is_reportcover = false;
 
     struct Package package;
-    struct Color color;
 %}
 
 %node AstNode %abstract %typedef = {
@@ -46,6 +45,10 @@
 
 %node ParamsLevel2 Element = {
     ElementVector elmtsl2;
+}
+
+%node TocParams Element = {
+    ElementVector params;
 }
 
 %node FigureParams Element = {
@@ -77,10 +80,19 @@
 %node PlaceParamL2 Element = { string_t text; }
 %node LogoParamL2 Element = { string_t text; }
 %node ToC Element = { string_t text; }
+%node LoF Element = { string_t text; }
+%node LoT Element = { string_t text; }
+%node DepthParam Element = { string_t text; }
+%node SpacingParam Element = { string_t text; }
 
 %node Figure Element = {
     FigureParams* params;
     string_t fig_name;
+}
+
+%node Table Element = {
+    string_t caption;
+    string_t table;
 }
 
 %node MultipleFigures Element = {
@@ -105,6 +117,11 @@
     ParamsLevel2* paramslevel2;
 }
 
+%node ComplexToc Element = {
+    string_t text;
+    TocParams* tocParams;        
+}
+
 %node NewPage Element
 
 %operation %virtual string_t genLatex(AstNode *this);
@@ -120,9 +137,7 @@ genLatex(Numbered) {
     if (text.compare("yes") == 0)
         is_numbered = true;
     else if (text != "no")
-        std::cout << "The " << 
-                color.open(Color::BrightYellow) << "numbered" << color.close() <<
-                " parameter will take the default value" << std::endl;
+        Code::Colored::warningDefaultValue("numbered");
     return code;
 }
 
@@ -134,7 +149,21 @@ genLatex(PageNumbering) {
 genLatex(ToC) {
     text = Code::Logic::trim(text);
     if (text.compare("yes") == 0)
-        return Code::toc(text);
+        return Code::toc();
+    return code;
+}
+
+genLatex(LoF) {
+    text = Code::Logic::trim(text);
+    if (text.compare("yes") == 0)
+        return Code::lof();
+    return code;
+}
+
+genLatex(LoT) {
+    text = Code::Logic::trim(text);
+    if (text.compare("yes") == 0)
+        return Code::lot();
     return code;
 }
 
@@ -276,6 +305,10 @@ genLatex(Figure) {
     return Code::singleFigureEnvironment(params->figureParams, fig_name);
 }
 
+genLatex(Table) {
+    return Code::table(caption, table);
+}
+
 genLatex(MultipleFigures) {
     package.add(Package::Graphicx);
     package.add(Package::Subfigure);
@@ -283,7 +316,7 @@ genLatex(MultipleFigures) {
     StringVector mfl = multipleFiguresLabel->mfl;
 
     code += Code::beginFigure();
-    code += (fig_position == "")? "[ht!]\n": "[" + Code::Logic::figurePosition(fig_position) + "]\n";
+    code += (fig_position == "")? "[ht!]\n": "[" + Code::Logic::options(fig_position) + "]\n";
     code += Code::centering();
 
     for (auto i = 0; i < mfv.size(); i++)
@@ -292,4 +325,46 @@ genLatex(MultipleFigures) {
     code += Code::caption(caption);
     code += Code::endFigure();
     return code;
+}
+
+genLatex(TocParams) {
+    string_t depth_code = "";
+
+    for (const auto elmt : params) {
+        if (elmt->isA(DepthParam_kind))
+            depth_code = elmt->genLatex();
+        else
+            code += elmt->genLatex();
+    }
+    return depth_code + code;
+}
+
+genLatex(ComplexToc) {
+    return tocParams->genLatex();
+}
+
+genLatex(DepthParam) {
+    text = Code::Logic::trim(text);
+    auto depth = atoi(text.c_str());
+
+    switch(depth) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            return Code::tocDepthParam(depth);
+        default:
+            Code::Colored::warningDefaultValue("depth");
+            return Code::tocDepthParam(3);
+    }
+    return code;
+}
+
+genLatex(SpacingParam) {
+    package.add(Package::Setspace);
+    text = Code::Logic::trim(text);
+
+    // single, onehalf, double
+    return Code::tocSpacingParam(text);
 }

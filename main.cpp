@@ -1,11 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sys/stat.h>
-#include "lexer.h"
-#include "ast.h"
-
-std::string outFileName(char const *arg);
-void createLatexFolders();
+#include "main.h"
 
 int main(int argc, char* argv[])
 {
@@ -17,8 +10,11 @@ int main(int argc, char* argv[])
     Ast::AstNode *root;
     Expr::Parser parser(lexer, root);
 
-    createLatexFolders();
+    if (argv[2] != NULL)
+        dev_arg = std::string(argv[2]);
 
+    flagEval(dev_arg);
+    
     try {
         parser.parse();
         code = root->genLatex();
@@ -32,27 +28,46 @@ int main(int argc, char* argv[])
 
 std::string outFileName(char const *arg)
 {
+    std::string in_path;
     std::string file_name("");
 
-    auto idx = 0;
-    while(arg[idx] != '\0') {
-        if (arg[idx] == '/') 
-            file_name = "../latex/tex/";
-        idx++;
-        file_name.push_back(arg[idx]);
-    }
-    
-    idx = file_name.size()-1;
-    while (file_name[idx--] != '.')
-        file_name.pop_back();
+    if (arg != NULL)
+        in_path = std::string(arg);
 
-    file_name += "tex";
-    return file_name;
+    for (int i = in_path.length()-1; i >= 0; i--)
+    {
+        if (in_path[i] == '/')
+            break;
+        file_name.insert(file_name.begin(), in_path[i]);
+    }
+
+    for (int i = file_name.length()-1; file_name[i] != '.'; i--)
+        file_name.pop_back();
+    
+    if (dev_arg == "--dev")
+        return "../latex/tex/" + file_name + "tex";
+    return "latex/tex/" + file_name + "tex";
 }
 
-void createLatexFolders()
+// solo para entorno de desarrollo
+void createLatexFoldersDev()
 {
     mkdir("../latex", S_IRWXU);
     mkdir("../latex/tex", S_IRWXU);
     mkdir("../latex/images", S_IRWXU);
+}
+
+void createLatexFolders()
+{
+    mkdir("latex", S_IRWXU);
+    mkdir("latex/tex", S_IRWXU);
+    mkdir("latex/images", S_IRWXU);
+}
+
+void flagEval(std::string flag)
+{
+    if (flag == "--dev")
+        createLatexFoldersDev();
+    else 
+        createLatexFolders();
 }

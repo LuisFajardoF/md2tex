@@ -37,6 +37,7 @@ namespace Expr {
 %token<std::string> Text "text"
 %token<std::string> ImageText "imageText"
 %token<std::string> FigureLabel "figureLabel"
+%token<std::string> TableLabel "tableLabel"
 %token<std::string> Default "default"
 %token<std::string> NewPage "newpage"
 %token<std::string> OpenParam "!--"
@@ -47,6 +48,11 @@ namespace Expr {
 %token<std::string> Cover "cover"
 %token<std::string> Class "class"
 %token<std::string> ToC "toc"
+%token<std::string> LoF "lof"
+%token<std::string> LoT "lot"
+%token<std::string> Depth "depth"
+%token<std::string> Spacing "spacing"
+%token<std::string> Custom "custom"
 %token<std::string> Title "title"
 %token<std::string> Author "author"
 %token<std::string> Date "date"
@@ -63,6 +69,7 @@ namespace Expr {
 %token<std::string> Roman "roman"
 %token<std::string> Set "set"
 %token<std::string> Figure "figure"
+%token<std::string> Table "table"
 %token<std::string> OpenBracket "["
 %token<std::string> CloseBracket "]"
 %token<std::string> OpenPar "("
@@ -76,8 +83,10 @@ namespace Expr {
 %type<Ast::Element *> element
 %type<Ast::ParamsLevel1 *> param_level1_list
 %type<Ast::ParamsLevel2 *> param_level2_list
+%type<Ast::TocParams *> toc_params_list
 %type<Ast::AstNode *> param_level1
 %type<Ast::AstNode *> param_level2
+%type<Ast::AstNode *> toc_params
 %type<Ast::FigureParams *> figure_param
 %type<Ast::MultipleFiguresParams *> multiple_figures_param
 %type<Ast::MultipleFiguresLabel *> multiple_figures_label
@@ -126,6 +135,9 @@ element: "h1" "text" {
     | "figure" "[" figure_param "]" "(" "figureLabel" ")" {
         $$ = new Ast::Figure($3, $6);
     }
+    | "table" "[" "tableLabel" "]" "{" "tableLabel" "}" {
+        $$ = new Ast::Table($3, $6);
+    }
     | "newpage" {
         $$ = new Ast::NewPage();
     }
@@ -168,6 +180,15 @@ param_level1: "cover" ":" "default" "{" param_level2_list "}" {
     }
     | "toc" ":" "text" {
         $$ = new Ast::ToC($3);
+    }
+    | "toc" ":" "custom" "{" toc_params_list "}" {
+        $$ = new Ast::ComplexToc($3, $5);
+    }
+    | "lof" ":" "text" {
+        $$ = new Ast::LoF($3);
+    }
+    | "lot" ":" "text" {
+        $$ = new Ast::LoT($3);
     }
 ;
 
@@ -221,6 +242,17 @@ param_level2_list: param_level2_list param_level2 {
     } 
 ;
 
+toc_params_list: toc_params_list toc_params {
+        $$ = $1;
+        dynamic_cast<Ast::TocParams *>($$)->params.push_back($2);
+    }
+    | toc_params {
+        Ast::ElementVector params;
+        params.push_back($1);
+        $$ = new Ast::TocParams(params);
+    }
+;
+
 param_level2: "title" ":" "text" {
         $$ = new Ast::TitleParamL2($3);
     }
@@ -241,6 +273,14 @@ param_level2: "title" ":" "text" {
     }
     | "logo" ":" "imageText" {
         $$ = new Ast::LogoParamL2($3);
+    }
+;
+
+toc_params: "depth" ":" "text" {
+        $$ = new Ast::DepthParam($3);
+    }
+    | "spacing" ":" "text" {
+        $$ = new Ast::SpacingParam($3);
     }
 ;
 

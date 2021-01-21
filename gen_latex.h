@@ -31,10 +31,16 @@ namespace Code
     std::string centering();
     std::string caption(std::string& text);
     std::string pagenumbering(std::string& text);
-    std::string toc(std::string& text);
+    std::string toc();
+    std::string lof();
+    std::string lot();
     std::string pagenumberingAsSet(std::string& text, std::string& page_number);
     std::string singleFigureEnvironment(std::vector<std::string>& params, std::string& path);
     std::string multipleFigureEnvironment(std::vector<std::string>& params, std::string& path);
+    std::string tocSpacingParam(std::string& text);
+    std::string tocSpacingEnvironment(const std::string text);
+    std::string tocDepthParam(int depth);
+    std::string table(std::string& caption, std::string& table);
 
     // report cover
     std::string reportCoverLogo(std::string& text);
@@ -51,11 +57,20 @@ namespace Code
     std::string defaultCoverAuthor(std::string& text);
     std::string defaultCoverDate(std::string& text);
 
+    namespace Table {
+        std::string beginTable();
+        std::string endTable();
+    };
+
     namespace Logic {
-        std::string figurePosition(std::string param);
+        std::string options(std::string param);
         std::string noSpacesStr(std::string& path);
-        std::string trim(const std::string& str);
+        std::string trim(std::string& str);
         std::string includeGraphicsParams(std::vector<std::string>& params, bool singleFigure);
+    };
+
+    namespace Colored {
+        void warningDefaultValue(std::string text);
     };
 };
 
@@ -65,6 +80,7 @@ struct Package
     {
         Graphicx,
         Subfigure,
+        Setspace,
     };
 
     Package() {}
@@ -76,6 +92,7 @@ struct Package
     PackInfo packInfo = {
         {Graphicx, "graphicx"},
         {Subfigure, "subfigure"},
+        {Setspace, "setspace"},
     };
 
     void add(unsigned int pack);

@@ -1,3 +1,7 @@
+!--
+    lof: yes
+--!
+
 ![Un koala en el bosque, w= 9cm, h= 8cm, ho](koala.jpg)
 ![Un koala en el bosque, s=0.1, h=4cm, w=5cm, b](koala.jpg)
 ![Un koala en el bosque, s=0.3, a=90, t](koala.jpg)

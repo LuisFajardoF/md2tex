@@ -1,6 +1,6 @@
 !--
     cover: report {
-        logo: logo_unitec123-4.jpg
+        logo: logos/logo_unitec123-4.jpg
         institution: Universidad Tecnol'ogica Centroamaericana
         title: Gesti'on de Memoria Din'amica
         subject: Sistemas Operativos

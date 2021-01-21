@@ -12,14 +12,15 @@
         } while(false)
     
     bool is_param = false;
-    bool is_image_path = false; // activa la regla [a-zA-Z0-9_.-/] para el path de imagenes 
+    bool is_image_path = false; // activa la regla [a-zA-Z0-9_.-/] para el path de imagenes
+    bool is_table_env = true; 
 %}
 
 %x TEXT 
 %x PARAMS 
 %x LOGOTEXT
 %x LABELTEXT
-%x FIGURE
+%x FIGURE TABLE
 
 %%
 
@@ -146,6 +147,36 @@
 "toc" {
     if (is_param)
         return makeToken(yytext, yyleng, Token::ToC);
+    BEGIN(TEXT);
+}
+
+"lof" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::LoF);
+    BEGIN(TEXT);
+}
+
+"lot" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::LoT);
+    BEGIN(TEXT);
+}
+
+"depth" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Depth);
+    BEGIN(TEXT);
+}
+
+"spacing" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Spacing);
+    BEGIN(TEXT);
+}
+
+"custom" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::Custom);
     BEGIN(TEXT);
 }
 
@@ -281,6 +312,40 @@
 }
 
 <FIGURE>. { /* default rule FIGURE */ }
+
+"!["[a-zA-Z0-9 \n\t:|-]+"]{"[a-zA-Z0-9 \n\t:|-]+"}" {
+    auto offset = strlen(yytext);
+
+    while(yytext[offset] != '!')
+        unput(yytext[--offset]); 
+    BEGIN(TABLE);
+    return makeToken(yytext, yyleng, Token::Table); 
+}
+
+<TABLE>[a-zA-Z0-9 \n\t:|-]+ {
+    yylval.emplace<std::string>(yytext, yyleng);
+    // std::cout << yytext << std::endl;
+    return makeToken(yytext, yyleng, Token::TableLabel);
+}
+
+<TABLE>"[" {
+    return makeToken(yytext, yyleng, Token::OpenBracket);
+}
+
+<TABLE>"]" {
+    return makeToken(yytext, yyleng, Token::CloseBracket);
+}
+
+<TABLE>"{" {
+    return makeToken(yytext, yyleng, Token::OpenKey);
+}
+
+<TABLE>"}" {
+    BEGIN(INITIAL);
+    return makeToken(yytext, yyleng, Token::CloseKey);
+}
+
+<TABLE>. { /* default rule TABLE */ }
 
 [a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿?] {
     yylval.emplace<std::string>(yytext, yyleng);

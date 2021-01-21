@@ -211,9 +211,19 @@ std::string Code::pagenumbering(std::string& text)
     return "\t\\pagenumbering{" + text + "}\n";
 }
 
-std::string Code::toc(std::string& text)
+std::string Code::toc()
 {
     return "\t\\tableofcontents\n";
+}
+
+std::string Code::lof()
+{
+    return "\t\\listoffigures\n";
+}
+
+std::string Code::lot()
+{
+    return "\t\\listoftables\n";
 }
 
 std::string Code::pagenumberingAsSet(std::string& text, std::string& page_number)
@@ -234,7 +244,7 @@ std::string Code::singleFigureEnvironment(std::vector<std::string>& params, std:
                 "{../images/" + Code::Logic::noSpacesStr(path) + "}\n" + 
                 Code::caption(params[0]) + Code::endFigure();
 
-    fig_position = Code::Logic::figurePosition(params[params_size-1]);
+    fig_position = Code::Logic::options(params[params_size-1]);
     fig_params = Code::Logic::includeGraphicsParams(params, true);
 
     return Code::beginFigure() + "[" + fig_position + "]\n" + Code::centering() +
@@ -258,8 +268,61 @@ std::string Code::multipleFigureEnvironment(std::vector<std::string>& params, st
         fig_params + "]{../images/" + Code::Logic::noSpacesStr(path) + "}\n\t\t}\n";
 }
 
+std::string Code::tocSpacingParam(std::string& text)
+{
+    std::string code;
+    
+    if (text.compare("single") == 0)
+        code += tocSpacingEnvironment("singlespacing");
+    else if (text.compare("onehalf") == 0)
+        code += tocSpacingEnvironment("onehalfspacing");
+    else if (text.compare("double") == 0)
+        code += tocSpacingEnvironment("doublespacing");
+    else {
+        code += tocSpacingEnvironment("singlespacing");
+        Code::Colored::warningDefaultValue("spacing");
+    }
+
+    return code;
+}
+
+std::string Code::tocDepthParam(int depth)
+{
+    return "\t\\setcounter{tocdepth}{" + std::to_string(depth) + "}\n";
+}
+
+std::string Code::tocSpacingEnvironment(const std::string text)
+{
+    std::string begin = "\t\\begin{" + text + "}\n";
+    std::string toc = "\t\t\\tableofcontents\n";
+    std::string end = "\t\\end{" + text + "}\n";
+    return begin + toc + end;
+}
+
+std::string Code::table(std::string& caption, std::string& table)
+{
+    std::string code;
+
+    code += Code::Table::beginTable();
+    code += centering();
+    code += Code::caption(caption);
+    code += Code::Table::endTable();
+    return code;
+}
+
+// Code::Table namespace
+std::string Code::Table::beginTable()
+{
+    return "\n\t\\begin{table}\n";
+}
+
+std::string Code::Table::endTable()
+{
+    return "\t\\end{table}\n";
+}
+
 // Code::Logic namespace
-std::string Code::Logic::figurePosition(std::string param)
+std::string Code::Logic::options(std::string param)
 {
     std::string fig_position = "";
 
@@ -321,7 +384,7 @@ std::string Code::Logic::noSpacesStr(std::string& path)
     return path;
 }
 
-std::string Code::Logic::trim(const std::string& str)
+std::string Code::Logic::trim(std::string& str)
 {
     auto begin = str.begin();
     while (begin != str.end() && std::isspace(*begin))
@@ -355,7 +418,7 @@ std::string Package::packsCode()
     return code;
 }
 
-// Color namespace 
+// Color struct 
 std::string Color::open(unsigned int color)
 {
     return colorInfo[color];
@@ -364,4 +427,16 @@ std::string Color::open(unsigned int color)
 std::string Color::close()
 {
     return "\033[0m";
+}
+
+// Colored namespace
+void Code::Colored::warningDefaultValue(std::string text)
+{
+    Color color;
+    std::cout << "The " 
+            << color.open(Color::BrightYellow) 
+            << text 
+            << color.close() 
+            << " parameter will take the default value" 
+            << std::endl;
 }

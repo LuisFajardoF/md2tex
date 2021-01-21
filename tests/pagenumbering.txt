@@ -15,7 +15,7 @@ Faucibus vitae aliquet nec ullamcorper sit amet risus. Dictum at tempor commodo
 ullamcorper a lacus. Egestas sed tempus urna et pharetra pharetra massa. Cursus 
 sit amet dictum sit amet justo donec enim diam. Tellus orci ac auctor augue. 
 
-![Gasherbrum, 10cm, 8cm, hto](mountain.jpg)
+![Gasherbrum, w=10cm, h=8cm, hto](mountain.jpg)
 
 ---
 
@@ -25,7 +25,7 @@ aliquet enim tortor at auctor. Rhoncus dolor purus non enim praesent elementum
 facilisis leo. Viverra vitae congue eu consequat ac felis donec et odio. 
 Ac feugiat sed lectus vestibulum mattis ullamcorper. At urna condimentum mattis 
 pellentesque id nibh tortor id. Mauris rhoncus aenean vel elit.
-![My Organization, 3cm, 3cm, ho](mylogo.png)
+![My Organization, w=3cm, h=3cm, ho](mylogo.png)
 ---
 !--
     pagenumbering: Roman {

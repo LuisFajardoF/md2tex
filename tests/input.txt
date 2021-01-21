@@ -1,6 +1,9 @@
 !--
     numbered: yes
-    toc : yes
+    toc : custom { 
+        spacing: onehalf 
+        depth: 2
+    }
 --!
 
 # Section 1 {My First Section} 
