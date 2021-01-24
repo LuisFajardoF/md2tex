@@ -1,5 +1,7 @@
 #include "gen_latex.h"
 
+bool use_siunitx = false;
+
 std::string Code::documentClass()
 {
     return "\\documentclass{article}\n\n";
@@ -304,7 +306,8 @@ std::string Code::table(std::string& caption, std::string& table)
     std::string code;
 
     code += Code::Table::beginTable();
-    code += centering();
+    code += Code::centering();
+    code += Code::Table::content(table);
     code += Code::caption(caption);
     code += Code::Table::endTable();
     return code;
@@ -313,12 +316,106 @@ std::string Code::table(std::string& caption, std::string& table)
 // Code::Table namespace
 std::string Code::Table::beginTable()
 {
-    return "\n\t\\begin{table}\n";
+    return "\n\t\\begin{table}[h!]\n";
 }
 
 std::string Code::Table::endTable()
 {
     return "\t\\end{table}\n";
+}
+
+std::string Code::Table::content(std::string& content)
+{
+    std::vector<std::string> rows;
+    std::string delimiter = "\n";
+    std::string outContent = "";
+
+    size_t position = 0;
+    while ((position = content.find(delimiter)) != std::string::npos) 
+    {
+        rows.push_back(content.substr(0, position));
+        content.erase(0, position + delimiter.length());
+    }
+
+    rows.erase(rows.begin());
+
+    outContent += "\t\t\\begin{tabular}{" + getAlign(rows[1]) + "} \\hline\n"
+                "\t\t\t" + getHeader(rows[0]);
+    rows.erase(rows.begin());
+    rows.erase(rows.begin());
+
+    outContent += Code::Table::getRows(rows);
+    outContent += "\t\t\\end{tabular}\n";
+
+    return outContent;
+}
+
+std::string Code::Table::getHeader(std::string& header)
+{
+    std::string formatHeader = "";
+    std::string outHeader = "";
+
+    for (int i = 0; i < header.length(); i++) 
+    {
+        if (header[i] != '|')
+            formatHeader.push_back(header[i]);
+        else {
+            outHeader += "\\textbf{" + formatHeader + "} & ";
+            formatHeader.erase();
+        } 
+    }
+
+    outHeader += "\\textbf{" + formatHeader + "} \\\\ \\hline \n";
+    return outHeader;
+}
+
+std::string Code::Table::getAlign(std::string& align)
+{
+    std::string formatAlign = "";
+    std::string outAlign = "|";
+    std::vector<std::string> cols;
+
+    for (int i = 0; i < align.length(); i++)
+    {
+        if (align[i] != '|')
+            formatAlign.push_back(align[i]);
+        else {
+            cols.push_back(formatAlign);
+            formatAlign.erase();
+        }
+    }
+    cols.push_back(formatAlign);
+
+    for ( auto col : cols ) {
+        if (col[0] == ':' && col[col.length()-1] == ':')
+            outAlign += "c|";
+        else if (col[0] == ':')
+            outAlign += "l|";
+        else if (col[col.length()-1] == ':')
+            outAlign += "r|";
+        else if (col[0] == '<' && col[col.length()-1] == '>') {
+            use_siunitx = true;
+            outAlign += "S|";
+        } else 
+            outAlign += "l|";
+    }
+
+    return outAlign;
+}
+
+std::string Code::Table::getRows(std::vector<std::string>& rows)
+{
+    std::string outRows = "";
+
+    for (int i = 0; i < rows.size(); i++) {
+        for (int j = 0; j < rows[i].size(); j++) {
+            if (rows[i][j] == '|')
+                rows[i][j] = '&';
+        }
+        outRows += "\t\t\t" + rows[i] + " \\\\ \\hline\n";
+    }
+
+    return outRows;
 }
 
 // Code::Logic namespace
@@ -396,7 +493,7 @@ std::string Code::Logic::trim(std::string& str)
     return std::string(begin, end+1);
 }
 
-// Package namespace
+// Package struct
 void Package::add(unsigned int pack)
 {
     std::vector<std::string>::iterator it;
@@ -415,6 +512,26 @@ std::string Package::packsCode()
     
     if (code != "") 
         code += "\n";
+    return code;
+}
+
+// Preamble struct
+void Preamble::add(unsigned int preambleCode)
+{
+    std::vector<std::string>::iterator it;
+    it = std::find(codes.begin(), codes.end(), code[preambleCode]);
+
+    if (it == codes.end())
+        codes.push_back(code[preambleCode]);
+}
+
+std::string Preamble::getCode()
+{
+    std::string code = "";
+
+    for (auto it : codes)
+        code += it;
+    
     return code;
 }
 

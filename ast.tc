@@ -27,6 +27,7 @@
     bool is_reportcover = false;
 
     struct Package package;
+    struct Preamble preamble;
 %}
 
 %node AstNode %abstract %typedef = {
@@ -177,8 +178,8 @@ genLatex(BlockElement) {
     for (const auto elmt : elements)
         code += elmt->genLatex();
     code += Code::endDocument();
-    code = latexclass_exist? headcode + package.packsCode() + begin_document + code 
-                    : singlehead + package.packsCode() + begin_document + code;
+    code = latexclass_exist? headcode + package.packsCode() + preamble.getCode() + begin_document + code 
+                    : singlehead + package.packsCode() + preamble.getCode() + begin_document + code;
     return code;
 }
 
@@ -306,7 +307,16 @@ genLatex(Figure) {
 }
 
 genLatex(Table) {
-    return Code::table(caption, table);
+    code += Code::table(caption, table); 
+    if (use_siunitx) {
+        package.add(Package::Siunitx);
+        preamble.code.insert({
+            Preamble::Siunitx, 
+            "\\sisetup{\n\tround-mode = places,\n\tround-precision = 2\n}\n\n"
+        });
+        preamble.add(Preamble::Siunitx);
+    }
+    return code;
 }
 
 genLatex(MultipleFigures) {

@@ -8,6 +8,8 @@
 #include <vector>
 #include <unordered_map>
 
+extern bool use_siunitx;
+
 namespace Code 
 {
     std::string documentClass();
@@ -60,6 +62,10 @@ namespace Code
     namespace Table {
         std::string beginTable();
         std::string endTable();
+        std::string content(std::string& content);
+        std::string getAlign(std::string& align);
+        std::string getHeader(std::string& header);
+        std::string getRows(std::vector<std::string>& rows);
     };
 
     namespace Logic {
@@ -81,6 +87,7 @@ struct Package
         Graphicx,
         Subfigure,
         Setspace,
+        Siunitx,
     };
 
     Package() {}
@@ -93,10 +100,30 @@ struct Package
         {Graphicx, "graphicx"},
         {Subfigure, "subfigure"},
         {Setspace, "setspace"},
+        {Siunitx, "siunitx"},
     };
 
     void add(unsigned int pack);
     std::string packsCode();
+};
+
+struct Preamble
+{
+    enum 
+    {
+        Siunitx,
+    };
+
+    Preamble() {}
+    ~Preamble() {}
+    using Code = std::unordered_map<unsigned int, std::string>;
+    std::vector<std::string> codes;
+
+    // preamble code
+    Code code;
+
+    void add(unsigned int code);
+    std::string getCode();
 };
 
 struct Color 

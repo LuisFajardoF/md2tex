@@ -1,0 +1,20 @@
+\documentclass{article}
+
+\begin{document}
+	\pagenumbering{gobble}
+
+	\subsection*{Esta p\'agina no est\'a numerada.}
+	\newpage
+	\pagenumbering{Roman}
+
+	\subsection*{A partir de esta p\'agina se numera con: \textit{Roman} y la numeraci\'on comenzar\'a en I. }
+	\newpage
+	\pagenumbering{Alph}
+
+	\subsection*{A partir de esta p\'agina se numera con: \textit{Alph} y la numeraci\'on comenzar\'a en A.}
+	\newpage
+	\pagenumbering{arabic}
+	\setcounter{page}{6}
+
+	\subsection*{A partir de esta p\'agina se numera con: \textit{arabic} y la numeraci\'on comenzar\'a en 6.}
+\end{document}
