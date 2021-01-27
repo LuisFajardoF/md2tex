@@ -313,7 +313,7 @@
 
 <FIGURE>. { /* default rule FIGURE */ }
 
-"!["[a-zA-Z0-9 \n\t:|.<>-]+"]{"[a-zA-Z0-9 \n\t:|.<>-]+"}" {
+"!["[a-zA-Z0-9 \n\t:|.<>;/-]+"]{"[a-zA-Z0-9 \n\t:|.<>/-]+"}" {
     auto offset = strlen(yytext);
 
     while(yytext[offset] != '!')
@@ -322,7 +322,7 @@
     return makeToken(yytext, yyleng, Token::Table); 
 }
 
-<TABLE>[a-zA-Z0-9 \n\t:|.<>-]+ {
+<TABLE>[a-zA-Z0-9 \n\t:|.<>;/-]+ {
     yylval.emplace<std::string>(yytext, yyleng);
     // std::cout << yytext << std::endl;
     return makeToken(yytext, yyleng, Token::TableLabel);

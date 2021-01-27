@@ -92,8 +92,8 @@
 }
 
 %node Table Element = {
-    string_t caption;
-    string_t table;
+    string_t params;
+    string_t content;
 }
 
 %node MultipleFigures Element = {
@@ -307,7 +307,7 @@ genLatex(Figure) {
 }
 
 genLatex(Table) {
-    code += Code::table(caption, table); 
+    code += Code::table(params, content); 
     if (use_siunitx) {
         package.add(Package::Siunitx);
         preamble.code.insert({
@@ -316,6 +316,11 @@ genLatex(Table) {
         });
         preamble.add(Preamble::Siunitx);
     }
+
+    if (use_booktabs) package.add(Package::Booktabs);
+    if (use_xcolor) package.add(Package::Xcolor);
+    if (use_colortbl) package.add(Package::Colortbl);
+    if (use_pgfplotstable) package.add(Package::Pgfplotstable);
     return code;
 }
 

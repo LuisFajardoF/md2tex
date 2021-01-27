@@ -8,7 +8,7 @@
 #include <vector>
 #include <unordered_map>
 
-extern bool use_siunitx;
+#include "gen_table.h"
 
 namespace Code 
 {
@@ -42,8 +42,8 @@ namespace Code
     std::string tocSpacingParam(std::string& text);
     std::string tocSpacingEnvironment(const std::string text);
     std::string tocDepthParam(int depth);
-    std::string table(std::string& caption, std::string& table);
-
+    std::string table(std::string& params, std::string& content);
+    
     // report cover
     std::string reportCoverLogo(std::string& text);
     std::string reportCoverTitle(std::string& text);
@@ -59,14 +59,11 @@ namespace Code
     std::string defaultCoverAuthor(std::string& text);
     std::string defaultCoverDate(std::string& text);
 
-    namespace Table {
-        std::string beginTable();
-        std::string endTable();
-        std::string content(std::string& content);
-        std::string getAlign(std::string& align);
-        std::string getHeader(std::string& header);
-        std::string getRows(std::vector<std::string>& rows);
-    };
+    namespace Tables {
+        std::string* getParamsTable(std::string& params);
+        std::string getColorTable(std::string& param);
+        bool isCSV(std::string*& params_arr);
+    }
 
     namespace Logic {
         std::string options(std::string param);
@@ -88,6 +85,10 @@ struct Package
         Subfigure,
         Setspace,
         Siunitx,
+        Booktabs,
+        Xcolor,
+        Colortbl,
+        Pgfplotstable,
     };
 
     Package() {}
@@ -101,6 +102,10 @@ struct Package
         {Subfigure, "subfigure"},
         {Setspace, "setspace"},
         {Siunitx, "siunitx"},
+        {Booktabs, "booktabs"},
+        {Xcolor, "xcolor"},
+        {Colortbl, "colortbl"},
+        {Pgfplotstable, "pgfplotstable"},
     };
 
     void add(unsigned int pack);

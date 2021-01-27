@@ -1,7 +1,5 @@
 #include "gen_latex.h"
 
-bool use_siunitx = false;
-
 std::string Code::documentClass()
 {
     return "\\documentclass{article}\n\n";
@@ -301,121 +299,123 @@ std::string Code::tocSpacingEnvironment(const std::string text)
     return begin + toc + end;
 }
 
-std::string Code::table(std::string& caption, std::string& table)
-{
-    std::string code;
+// Tables
 
-    code += Code::Table::beginTable();
-    code += Code::centering();
-    code += Code::Table::content(table);
-    code += Code::caption(caption);
-    code += Code::Table::endTable();
+std::string Code::table(std::string& params, std::string& content)
+{
+    std::string code, color;
+    std::string* params_arr = Code::Tables::getParamsTable(params);
+
+    if (Code::Tables::isCSV(params_arr)) {
+        Code::Logic::noSpacesStr(content);
+
+        if (params_arr[1].find("style1") != std::string::npos) {
+            color = Code::Tables::getColorTable(params_arr[1]);
+            if (color == "undefined") {
+                TableCSVStyle1 tableCSVStyle1(content, params_arr[0]);
+                code = tableCSVStyle1.getCode();
+            } 
+            else {
+                TableCSVStyle1Colored tableCSVStyle1Colored(content, params_arr[0], color);
+                code = tableCSVStyle1Colored.getCode();
+            }
+        } 
+        else if (params_arr[1].find("style2") != std::string::npos) {
+            color = Code::Tables::getColorTable(params_arr[1]);
+            if (color == "undefined") {
+                TableCSVStyle2 tableCSVStyle2(content, params_arr[0]);
+                code = tableCSVStyle2.getCode();
+            } 
+            else {
+                TableCSVStyle2Colored tableCSVStyle2Colored(content, params_arr[0], color);
+                code = tableCSVStyle2Colored.getCode();
+            }
+        }
+        else {
+            TableCSV tableCSV(content, params_arr[0]);
+            code = tableCSV.getCode();
+        }
+    } 
+    else {
+        if (params_arr[1].find("style1") != std::string::npos) {
+            color = Code::Tables::getColorTable(params_arr[1]);
+            if (color == "undefined") {
+                TableStyle1 tableStyle1(content, params_arr[0]);
+                code = tableStyle1.getCode();
+            }
+            else {
+                TableStyle1Colored tableStyle1Colored(content, params_arr[0], color);
+                code = tableStyle1Colored.getCode();
+            }
+        } else if (params_arr[1].find("style2") != std::string::npos) {
+            color = Code::Tables::getColorTable(params_arr[1]);
+            if (color == "undefined") {
+                TableStyle2 tableStyle2(content, params_arr[0]);
+                code = tableStyle2.getCode();
+            }
+            else {
+                TableStyle2Colored tableStyle2Colored(content, params_arr[0], color);
+                code = tableStyle2Colored.getCode();
+            }
+        } 
+        else {
+            Table normalTable(content, params_arr[0]);
+            code = normalTable.getCode();
+        }
+    }
+
     return code;
 }
 
-// Code::Table namespace
-std::string Code::Table::beginTable()
+std::string* Code::Tables::getParamsTable(std::string& params)
 {
-    return "\n\t\\begin{table}[h!]\n";
-}
+    std::string* params_arr = new std::string[3];
+    params_arr[0] = params_arr[1] = params_arr[2] = "";
 
-std::string Code::Table::endTable()
-{
-    return "\t\\end{table}\n";
-}
-
-std::string Code::Table::content(std::string& content)
-{
-    std::vector<std::string> rows;
-    std::string delimiter = "\n";
-    std::string outContent = "";
-
-    size_t position = 0;
-    while ((position = content.find(delimiter)) != std::string::npos) 
-    {
-        rows.push_back(content.substr(0, position));
-        content.erase(0, position + delimiter.length());
+    for (int i = 0, off = 0; i < params.length(); i++) {
+        if (params[i] != ';')
+            params_arr[off].push_back(params[i]);
+        else 
+            off++;
     }
 
-    rows.erase(rows.begin());
-
-    outContent += "\t\t\\begin{tabular}{" + getAlign(rows[1]) + "} \\hline\n"
-                "\t\t\t" + getHeader(rows[0]);
-    rows.erase(rows.begin());
-    rows.erase(rows.begin());
-
-    outContent += Code::Table::getRows(rows);
-    outContent += "\t\t\\end{tabular}\n";
-
-    return outContent;
+    return params_arr;
 }
 
-std::string Code::Table::getHeader(std::string& header)
+std::string Code::Tables::getColorTable(std::string& param)
 {
-    std::string formatHeader = "";
-    std::string outHeader = "";
+    std::string color;
+    std::string colors[] = {"black", "blue", "brown", "cyan", "darkgray", "gray", 
+                            "green", "lime", "magenta", "olive", "orange", "pink", 
+                            "purple", "red", "teal", "violet", "white", "yellow"};
 
-    for (int i = 0; i < header.length(); i++) 
-    {
-        if (header[i] != '|')
-            formatHeader.push_back(header[i]);
-        else {
-            outHeader += "\\textbf{" + formatHeader + "} & ";
-            formatHeader.erase();
-        } 
+    bool param_color = false, valid_color = false; 
+
+    for (int i = 0; i < param.length(); i++) {
+        if (param_color)
+            color.push_back(param[i]);
+        if (param[i] ==  '-')
+            param_color = true;
     }
 
-    outHeader += "\\textbf{" + formatHeader + "} \\\\ \\hline \n";
-    return outHeader;
-}
-
-std::string Code::Table::getAlign(std::string& align)
-{
-    std::string formatAlign = "";
-    std::string outAlign = "|";
-    std::vector<std::string> cols;
-
-    for (int i = 0; i < align.length(); i++)
-    {
-        if (align[i] != '|')
-            formatAlign.push_back(align[i]);
-        else {
-            cols.push_back(formatAlign);
-            formatAlign.erase();
+    for ( auto c : colors) {
+        if (color == c ) {
+            valid_color = true;
+            break;
         }
     }
-    cols.push_back(formatAlign);
 
-    for ( auto col : cols ) {
-        if (col[0] == ':' && col[col.length()-1] == ':')
-            outAlign += "c|";
-        else if (col[0] == ':')
-            outAlign += "l|";
-        else if (col[col.length()-1] == ':')
-            outAlign += "r|";
-        else if (col[0] == '<' && col[col.length()-1] == '>') {
-            use_siunitx = true;
-            outAlign += "S|";
-        } else 
-            outAlign += "l|";
-    }
-
-    return outAlign;
+    return valid_color? color : "undefined";
 }
 
-std::string Code::Table::getRows(std::vector<std::string>& rows)
+bool Code::Tables::isCSV(std::string*& params_arr)
 {
-    std::string outRows = "";
-
-    for (int i = 0; i < rows.size(); i++) {
-        for (int j = 0; j < rows[i].size(); j++) {
-            if (rows[i][j] == '|')
-                rows[i][j] = '&';
-        }
-        outRows += "\t\t\t" + rows[i] + " \\\\ \\hline\n";
-    }
-
-    return outRows;
+    if (params_arr[1].find("csv") != std::string::npos)
+        return true;
+    if (params_arr[2].find("csv") != std::string::npos)
+        return true;
+    
+    return false;
 }
 
 // Code::Logic namespace

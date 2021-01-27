@@ -34,6 +34,7 @@ include_directories(${PROJECT_SOURCE_DIR})
   
 add_executable(${PROJECT_NAME}  ast.cpp
                             gen_latex.cpp
+                            gen_table.cpp
                             parser.cpp
                             lexer.cpp
                             main.cpp)
