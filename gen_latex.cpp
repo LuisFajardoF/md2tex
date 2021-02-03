@@ -300,11 +300,10 @@ std::string Code::tocSpacingEnvironment(const std::string text)
 }
 
 // Tables
-
 std::string Code::table(std::string& params, std::string& content)
 {
     std::string code, color;
-    std::string* params_arr = Code::Tables::getParamsTable(params);
+    std::string* params_arr = Code::Logic::getParams(params);
 
     if (Code::Tables::isCSV(params_arr)) {
         Code::Logic::noSpacesStr(content);
@@ -367,7 +366,7 @@ std::string Code::table(std::string& params, std::string& content)
     return code;
 }
 
-std::string* Code::Tables::getParamsTable(std::string& params)
+std::string* Code::Logic::getParams(std::string& params)
 {
     std::string* params_arr = new std::string[3];
     params_arr[0] = params_arr[1] = params_arr[2] = "";
@@ -386,8 +385,8 @@ std::string Code::Tables::getColorTable(std::string& param)
 {
     std::string color;
     std::string colors[] = {"black", "blue", "brown", "cyan", "darkgray", "gray", 
-                            "green", "lime", "magenta", "olive", "orange", "pink", 
-                            "purple", "red", "teal", "violet", "white", "yellow"};
+                            "green", "lightgray", "lime", "magenta", "olive", "orange", 
+                            "pink", "purple", "red", "teal", "violet", "white", "yellow"};
 
     bool param_color = false, valid_color = false; 
 
@@ -416,6 +415,26 @@ bool Code::Tables::isCSV(std::string*& params_arr)
         return true;
     
     return false;
+}
+
+// Lists
+std::string Code::list(std::string& params, std::string& content)
+{
+    std::string code;    
+    std::string* params_arr = Code::Logic::getParams(params);
+
+    if (params_arr[0].find("unordered-list") != std::string::npos) {
+        auto u_list(new UnorderedList(params, content));
+        code = u_list->getCode();
+    } else if (params_arr[0].find("ordered-list") != std::string::npos) {
+        auto o_list(new OrderedList(params, content));
+        code = o_list->getCode();
+    } else if (params_arr[0].find("nested-list") != std::string::npos) {
+        auto n_list(new NestedList(params, content));
+        code = n_list->getCode();
+    }
+
+    return code;
 }
 
 // Code::Logic namespace

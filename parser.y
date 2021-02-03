@@ -70,6 +70,9 @@ namespace Expr {
 %token<std::string> Set "set"
 %token<std::string> Figure "figure"
 %token<std::string> Table "table"
+%token<std::string> List "list"
+%token<std::string> ListParams "listParams"
+%token<std::string> ListContent "listContent"
 %token<std::string> OpenBracket "["
 %token<std::string> CloseBracket "]"
 %token<std::string> OpenPar "("
@@ -137,6 +140,9 @@ element: "h1" "text" {
     }
     | "table" "[" "tableLabel" "]" "{" "tableLabel" "}" {
         $$ = new Ast::Table($3, $6);
+    }
+    | "list" "listParams" "]" "{" "listContent" "}" {
+        $$ = new Ast::List($2, $5);
     }
     | "newpage" {
         $$ = new Ast::NewPage();

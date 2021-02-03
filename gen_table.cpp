@@ -392,6 +392,7 @@ std::string TableCSV::getContent()
 {
     return "\t\t\\pgfplotstabletypeset[\n"
         "\t\t\tcol sep=comma,\n"
+        "\t\t\tstring type,\n"
         "\t\t\tassign column name/.style={/pgfplots/table/column name={\\textbf{#1}}},\n"
         "\t\t\tevery head row/.style={before row=\\hline},\n"
         "\t\t\tevery last row/.style={after row=\\hline},\n"
@@ -413,6 +414,7 @@ std::string TableCSVStyle1::getContent()
 {
     return "\t\t\\pgfplotstabletypeset[\n"
         "\t\t\tcol sep=comma,\n"
+        "\t\t\tstring type,\n"
         "\t\t\tassign column name/.style={/pgfplots/table/column name={\\textbf{#1}}},\n"
         "\t\t\tevery head row/.style={before row=\\toprule, after row=\\midrule},\n"
         "\t\t\tevery last row/.style={after row=\\midrule},\n"
@@ -435,6 +437,7 @@ std::string TableCSVStyle1Colored::getContent()
 {
     return "\t\t\\pgfplotstabletypeset[\n"
         "\t\t\tcol sep=comma,\n"
+        "\t\t\tstring type,\n"
         "\t\t\tevery head row/.style={before row=\\toprule, after row=\\midrule},\n"
         "\t\t\tassign column name/.style={/pgfplots/table/column name={\\textbf{#1}}},\n"
         "\t\t\tevery even row/.style={after row ={\\rowcolor{" + color +"!30}}, before row={\\rowcolor{" + color + "!10}}},\n"
@@ -453,6 +456,7 @@ std::string TableCSVStyle2::getContent()
 {
     return "\t\t\\pgfplotstabletypeset[\n"
         "\t\t\tcol sep=comma,\n"
+        "\t\t\tstring type,\n"
         "\t\t\tevery head row/.style={before row=\\toprule, after row=\\midrule},\n"
         "\t\t\tassign column name/.style={/pgfplots/table/column name={\\textbf{#1}}},\n"
         "\t\t\tevery last row/.style={before row=\\midrule, after row=\\bottomrule},\n"
@@ -472,6 +476,7 @@ std::string TableCSVStyle2Colored::getContent()
 {
     return "\t\t\\pgfplotstabletypeset[\n"
         "\t\t\tcol sep=comma,\n"
+        "\t\t\tstring type,\n"
         "\t\t\tevery head row/.style={before row=\\rowcolor{" + color + "!30} \\toprule, after row=\\midrule},\n"
         "\t\t\tassign column name/.style={/pgfplots/table/column name={\\textbf{#1}}},\n"
         "\t\t\tevery last row/.style={before row=\\rowcolor{" + color + "!10} \\midrule, after row=\\bottomrule},\n"

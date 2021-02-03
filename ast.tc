@@ -96,6 +96,11 @@
     string_t content;
 }
 
+%node List Element = {
+    string_t params;
+    string_t content;
+}
+
 %node MultipleFigures Element = {
     string_t caption;
     string_t fig_position;
@@ -321,6 +326,11 @@ genLatex(Table) {
     if (use_xcolor) package.add(Package::Xcolor);
     if (use_colortbl) package.add(Package::Colortbl);
     if (use_pgfplotstable) package.add(Package::Pgfplotstable);
+    return code;
+}
+
+genLatex(List) {
+    code += Code::list(params, content);
     return code;
 }
 

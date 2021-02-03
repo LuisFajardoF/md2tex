@@ -13,14 +13,14 @@
     
     bool is_param = false;
     bool is_image_path = false; // activa la regla [a-zA-Z0-9_.-/] para el path de imagenes
-    bool is_table_env = true; 
+    bool is_table_env = true;
 %}
 
 %x TEXT 
 %x PARAMS 
 %x LOGOTEXT
-%x LABELTEXT
-%x FIGURE TABLE
+%x LABELTEXT LISTCONTENT
+%x FIGURE TABLE LIST
 
 %%
 
@@ -324,7 +324,6 @@
 
 <TABLE>[a-zA-Z0-9 \n\t:|.<>;/-]+ {
     yylval.emplace<std::string>(yytext, yyleng);
-    // std::cout << yytext << std::endl;
     return makeToken(yytext, yyleng, Token::TableLabel);
 }
 
@@ -346,6 +345,46 @@
 }
 
 <TABLE>. { /* default rule TABLE */ }
+
+
+"["[a-zA-Z0-9 \n\t:|.,<>;/-]+"]{"[a-zA-Z0-9#:;<>!/¡`"@$%&*()_\[\]=+^~\\'.,¿? \n\t-]+"}" {
+    auto offset = strlen(yytext);
+
+    while(yytext[offset] != '[')
+        unput(yytext[--offset]);
+    BEGIN(LIST);
+    return makeToken(yytext, yyleng, Token::List);
+}
+
+<LIST>[a-zA-Z0-9 \n\t:|.,<>;/-]+ {
+    yylval.emplace<std::string>(yytext, yyleng);
+    return makeToken(yytext, yyleng, Token::ListParams);
+}
+
+<LIST>"]" {
+    return makeToken(yytext, yyleng, Token::CloseBracket);
+}
+
+<LIST>"{" {
+    BEGIN(LISTCONTENT);
+    return makeToken(yytext, yyleng, Token::OpenKey);
+}
+
+<LISTCONTENT>[a-zA-Z0-9#:;<>!/¡`"@$%&*()_\[\]=+^~\\'.,¿? \n\t-]+ {
+    text = std::string(yytext, yyleng);
+    
+    AuxFuncs::analyzeText(text);
+    yylval.emplace<std::string>(text);
+    BEGIN(LIST);
+    return makeToken(yytext, yyleng, Token::ListContent);
+}
+
+<LIST>"}" {
+    BEGIN(INITIAL);
+    return makeToken(yytext, yyleng, Token::CloseKey);
+}
+
+<LIST>. { /* default rule LIST */ }
 
 [a-zA-Z0-9#{}:;<>!/¡`"@$%&*()-_\[\]=+^~\\'.,¿?] {
     yylval.emplace<std::string>(yytext, yyleng);
@@ -545,4 +584,45 @@ bool AuxFuncs::emphasisCommands(std::string& text, int& offset, bool& is_emphasi
         }
     }
     return is_emphasis;
+}
+
+void AuxFuncs::analyzeText(std::string& text)
+{
+    bool is_emphasis = false;
+
+    auto offset = 0;
+    while(text[offset]) 
+    {
+        AuxFuncs::emphasisCommands(text, offset, is_emphasis);
+            
+        switch(text[offset]) 
+        {
+            case '#':
+            case '{':
+            case '}':
+            case '$':
+            case '%':
+            case '&':
+            case '_':
+            case '\'':
+            case '~':
+            case '^':
+                text.insert(offset, "\\");
+                offset++;
+            break;
+            case '<':
+                AuxFuncs::specialLatexCommands('<', text, offset);
+            break;
+            case '>':
+                AuxFuncs::specialLatexCommands('>', text, offset);
+            break;
+            case '\\':
+                AuxFuncs::specialLatexCommands('\\', text, offset);
+            break;
+            default:
+                break;
+        }
+
+        offset++;
+    }
 }

@@ -7,8 +7,10 @@
 #include <cstring>
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 #include "gen_table.h"
+#include "gen_list.h"
 
 namespace Code 
 {
@@ -43,6 +45,7 @@ namespace Code
     std::string tocSpacingEnvironment(const std::string text);
     std::string tocDepthParam(int depth);
     std::string table(std::string& params, std::string& content);
+    std::string list(std::string& params, std::string& content);
     
     // report cover
     std::string reportCoverLogo(std::string& text);
@@ -60,7 +63,6 @@ namespace Code
     std::string defaultCoverDate(std::string& text);
 
     namespace Tables {
-        std::string* getParamsTable(std::string& params);
         std::string getColorTable(std::string& param);
         bool isCSV(std::string*& params_arr);
     }
@@ -70,6 +72,7 @@ namespace Code
         std::string noSpacesStr(std::string& path);
         std::string trim(std::string& str);
         std::string includeGraphicsParams(std::vector<std::string>& params, bool singleFigure);
+        std::string* getParams(std::string& params);
     };
 
     namespace Colored {
