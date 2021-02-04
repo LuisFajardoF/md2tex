@@ -1,5 +1,5 @@
 
-[unordered-list; arabic]{
+[unordered-list; dash]{
 - hello
 - convenci'on
 - visualizaci'on _cursive_
@@ -14,7 +14,7 @@ ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate vel
 fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt 
 mollit anim id est laborum.
 
-[ordered-list]{
+[ordered-list; noitemsep; alph]{
 1. Uno
 2. Dos
 3. Tres
@@ -45,4 +45,11 @@ mollit anim id est laborum.
                     1. Nivel 6
                     2. Sexto Nivel
 4. Cuatro
+}
+
+[description-list]{
+    first. Primer Item
+    second. Segundo Item
+    third. Tercer Item
+    fourth- Cuarto Item
 }

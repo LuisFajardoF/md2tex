@@ -1,6 +1,13 @@
 #include "gen_list.h"
 
+bool use_enumitem = false;
+
 /****************** List ******************/
+List::List(std::string*& params, std::string& content) : params(params), content(content)
+{
+    if (params[1] != "") use_enumitem = true;
+}
+
 void List::fillItemsVector()
 {
     std::string line;
@@ -16,13 +23,25 @@ void List::fillItemsVector()
     }
 }
 
+std::string List::trim(std::string str)
+{
+    auto begin = str.begin();
+    while (begin != str.end() && std::isspace(*begin))
+        begin++;
+
+    auto end = str.end()-1;
+    while (std::distance(begin, end) > 0 && std::isspace(*end))
+        end--;
+    return std::string(begin, end+1);
+}
+
 /****************** Ordered List ******************/
-OrderedList::OrderedList(std::string& params, std::string& content) : List(params, content)
+OrderedList::OrderedList(std::string*& params, std::string& content) : List(params, content)
 {
     this->params = params;
     this->content = content;
 
-    setBegin();
+    setBegin(getParams());
     setEnd();
 }
 
@@ -33,7 +52,44 @@ std::string OrderedList::getCode()
         + getEnd();
 }
 
-void OrderedList::setBegin() { begin = "\t\\begin{enumerate}\n"; }
+std::string OrderedList::getParams()
+{
+    std::string code;
+
+    std::string param2 = trim(params[1]);
+    std::string param3 = trim(params[2]);
+
+    if (param2 != "")
+        code += "[" + getParamCode(param2);
+    if (param3 != "") 
+        code += "," + getParamCode(param3);
+    if (param2 != "") 
+        code += "]";
+    return code;
+}
+
+std::string OrderedList::getParamCode(std::string& param)
+{
+    std::string code;
+
+    if (param == "alph")
+        code += "label=\\alph*.";
+    else if (param == "Alph")
+        code += "label=\\Alph*.";
+    else if (param == "arabic")
+        code += "label=\\arabic*.";
+    else if (param == "roman")
+        code += "label=\\roman*.";
+    else if (param == "Roman")
+        code += "label=\\Roman*.";
+    else if (param == "noitemsep")
+        code += param;
+    else 
+        code += "label=\\arabic*.";
+    return code;
+}
+
+void OrderedList::setBegin(std::string params) { begin = "\t\\begin{enumerate} " + params + "\n"; }
 void OrderedList::setEnd() { end = "\t\\end{enumerate}\n"; }
 
 std::string OrderedList::getContent()
@@ -62,13 +118,52 @@ std::string OrderedList::generateItems()
     return code;
 }
 
+std::string UnorderedList::getParams()
+{
+    std::string code;
+
+    std::string param2 = trim(params[1]);
+    std::string param3 = trim(params[2]);
+
+    if (param2 != "")
+        code += "[" + getParamCode(param2);
+    if (param3 != "") 
+        code += "," + getParamCode(param3);
+    if (param2 != "") 
+        code += "]";
+    return code;
+}
+
+std::string UnorderedList::getParamCode(std::string& param)
+{
+    std::string code;
+
+    if (param == "bullet")
+        code += "label=$\\bullet$";
+    else if (param == "cdot")
+        code += "label=$\\cdot$";
+    else if (param == "diamond")
+        code += "label=$\\diamond$";
+    else if (param == "ast")
+        code += "label=$\\ast$";
+    else if (param == "circ")
+        code += "label=$\\circ$";
+    else if (param == "dash")
+        code += "label=$-$";
+    else if (param == "noitemsep")
+        code += param;
+    else 
+        code += "label=$\\bullet$";
+    return code;
+}
+
 /****************** Unordered List ******************/
-UnorderedList::UnorderedList(std::string& params, std::string& content) : List(params, content)
+UnorderedList::UnorderedList(std::string*& params, std::string& content) : List(params, content)
 {
     this->params = params;
     this->content = content;
 
-    setBegin(); 
+    setBegin(getParams()); 
     setEnd(); 
 }
 
@@ -79,7 +174,7 @@ std::string UnorderedList::getCode()
         + getEnd();
 }
 
-void UnorderedList::setBegin() { begin = "\t\\begin{itemize}\n"; }
+void UnorderedList::setBegin(std::string params) { begin = "\t\\begin{itemize}" + params + "\n"; }
 void UnorderedList::setEnd() { end = "\t\\end{itemize}\n"; }
 
 std::string UnorderedList::getContent()
@@ -105,8 +200,48 @@ std::string UnorderedList::generateItems()
     return out;
 }
 
+/****************** Description List ******************/
+DescriptionList::DescriptionList(std::string*& params, std::string& content) : List(params, content)
+{
+    this->params = params;
+    this->content = content;
+
+    setBegin();
+    setEnd();
+}
+
+std::string DescriptionList::getCode()
+{
+    return getBegin()
+        + getContent() 
+        + getEnd();
+}
+
+void DescriptionList::setBegin() { begin = "\t\\begin{description}\n"; }
+void DescriptionList::setEnd() { end = "\t\\end{description}\n"; }
+
+std::string DescriptionList::getContent()
+{
+    fillItemsVector();
+    return generateItems();
+}
+
+std::string DescriptionList::generateItems()
+{
+    std::string code;
+    char* token;
+
+    for (auto item : items) {
+        token = strtok(const_cast<char*>(item.c_str()), ".-");
+        code += "\t\t\\item[" + trim(std::string(token)) + "] ";
+        token = strtok(NULL, "\n");
+        code += std::string(token) + "\n";
+    }    
+    return code;
+}
+
 /****************** Nested List ******************/
-NestedList::NestedList(std::string& params, std::string& content) : List(params, content) 
+NestedList::NestedList(std::string*& params, std::string& content) : List(params, content) 
 {
     this->params = params;
     this->content = content;

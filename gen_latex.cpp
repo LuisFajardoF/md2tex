@@ -366,21 +366,6 @@ std::string Code::table(std::string& params, std::string& content)
     return code;
 }
 
-std::string* Code::Logic::getParams(std::string& params)
-{
-    std::string* params_arr = new std::string[3];
-    params_arr[0] = params_arr[1] = params_arr[2] = "";
-
-    for (int i = 0, off = 0; i < params.length(); i++) {
-        if (params[i] != ';')
-            params_arr[off].push_back(params[i]);
-        else 
-            off++;
-    }
-
-    return params_arr;
-}
-
 std::string Code::Tables::getColorTable(std::string& param)
 {
     std::string color;
@@ -423,15 +408,18 @@ std::string Code::list(std::string& params, std::string& content)
     std::string code;    
     std::string* params_arr = Code::Logic::getParams(params);
 
-    if (params_arr[0].find("unordered-list") != std::string::npos) {
-        auto u_list(new UnorderedList(params, content));
+    if (Code::Logic::trim(params_arr[0]) == "unordered-list") {
+        auto u_list(new UnorderedList(params_arr, content));
         code = u_list->getCode();
-    } else if (params_arr[0].find("ordered-list") != std::string::npos) {
-        auto o_list(new OrderedList(params, content));
+    } else if (Code::Logic::trim(params_arr[0]) == "ordered-list") {
+        auto o_list(new OrderedList(params_arr, content));
         code = o_list->getCode();
-    } else if (params_arr[0].find("nested-list") != std::string::npos) {
-        auto n_list(new NestedList(params, content));
+    } else if (Code::Logic::trim(params_arr[0]) == "nested-list") {
+        auto n_list(new NestedList(params_arr, content));
         code = n_list->getCode();
+    } else if (Code::Logic::trim(params_arr[0]) == "description-list") {
+        auto d_list(new DescriptionList(params_arr, content));
+        code = d_list->getCode();
     }
 
     return code;
@@ -510,6 +498,21 @@ std::string Code::Logic::trim(std::string& str)
     while (std::distance(begin, end) > 0 && std::isspace(*end))
         end--;
     return std::string(begin, end+1);
+}
+
+std::string* Code::Logic::getParams(std::string& params)
+{
+    std::string* params_arr = new std::string[3];
+    params_arr[0] = params_arr[1] = params_arr[2] = "";
+
+    for (int i = 0, off = 0; i < params.length(); i++) {
+        if (params[i] != ';')
+            params_arr[off].push_back(params[i]);
+        else 
+            off++;
+    }
+
+    return params_arr;
 }
 
 // Package struct

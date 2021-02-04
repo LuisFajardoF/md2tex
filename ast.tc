@@ -331,6 +331,7 @@ genLatex(Table) {
 
 genLatex(List) {
     code += Code::list(params, content);
+    if (use_enumitem) package.add(Package::Enumitem);
     return code;
 }
 

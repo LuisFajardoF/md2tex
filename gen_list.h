@@ -5,22 +5,23 @@
 #include <vector>
 #include <string.h>
 
+extern bool use_enumitem;
+
 class List
 {
     public:
-        List(std::string& params, std::string& content) : params(params), content(content) {}
+        List(std::string*& params, std::string& content);
         virtual std::string getCode() = 0;
 
     protected:
-        std::string params;
+        std::string* params;
         std::string content;
-        void setBegin();
-        void setEnd();
-        std::string getBegin();
-        std::string getEnd();
+        std::string getBegin() { return begin; }
+        std::string getEnd() { return end; }
         virtual std::string getContent() = 0;
         virtual std::string generateItems() = 0;
         void fillItemsVector();
+        std::string trim(std::string str);
         
         std::vector<std::string> items;
         std::string begin;
@@ -30,29 +31,42 @@ class List
 class UnorderedList : public List
 {
     public:
-        UnorderedList(std::string& params, std::string& content);
+        UnorderedList(std::string*& params, std::string& content);
         std::string getCode() override;
 
     private:
-        void setBegin();
+        void setBegin(std::string params);
         void setEnd();
-        std::string getBegin() { return begin; }
-        std::string getEnd() { return end; }
         std::string getContent() override;
         std::string generateItems() override;
+        std::string getParams();
+        std::string getParamCode(std::string& param);
 };
 
 class OrderedList : public List
 {
     public:
-        OrderedList(std::string& params, std::string& content);
+        OrderedList(std::string*& params, std::string& content);
+        std::string getCode() override;
+
+    private:
+        void setBegin(std::string params);
+        void setEnd();
+        std::string getContent() override;
+        std::string generateItems() override;
+        std::string getParams();
+        std::string getParamCode(std::string& param);
+};
+
+class DescriptionList : public List
+{
+    public:
+        DescriptionList(std::string*& params, std::string& content);
         std::string getCode() override;
 
     private:
         void setBegin();
         void setEnd();
-        std::string getBegin() { return begin; }
-        std::string getEnd() { return end; }
         std::string getContent() override;
         std::string generateItems() override;
 };
@@ -60,7 +74,7 @@ class OrderedList : public List
 class NestedList : public List
 {
     public:
-        NestedList(std::string& params, std::string& content);
+        NestedList(std::string*& params, std::string& content);
         std::string getCode() override;
 
     private:

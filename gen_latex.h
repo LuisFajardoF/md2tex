@@ -92,6 +92,7 @@ struct Package
         Xcolor,
         Colortbl,
         Pgfplotstable,
+        Enumitem,
     };
 
     Package() {}
@@ -109,6 +110,7 @@ struct Package
         {Xcolor, "xcolor"},
         {Colortbl, "colortbl"},
         {Pgfplotstable, "pgfplotstable"},
+        {Enumitem, "enumitem"},
     };
 
     void add(unsigned int pack);
