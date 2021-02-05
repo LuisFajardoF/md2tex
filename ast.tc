@@ -332,6 +332,19 @@ genLatex(Table) {
 genLatex(List) {
     code += Code::list(params, content);
     if (use_enumitem) package.add(Package::Enumitem);
+    if (use_amssymb) package.add(Package::Amssymb);
+    if (use_pifont) {
+        package.add(Package::Pifont);
+        preamble.code.insert({
+            Preamble::ToDoList,
+            "%% todolist --> variant of: Joe Corneli\n"
+            "%% https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list\n"
+            "\\newlist{todolist}{itemize}{1}\n"
+            "\\newcommand{\\done}{\\rlap{$\\square$}{\\large\\hspace{1pt}\\ding{51}}\\hspace{-2.5pt}}\n"
+            "\\newcommand{\\undone}{\\rlap{$\\square$}{\\large\\hspace{1pt}\\ding{55}}}\n\n"
+        });
+        preamble.add(Preamble::ToDoList);
+    } 
     return code;
 }
 

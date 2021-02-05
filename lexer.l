@@ -19,8 +19,9 @@
 %x TEXT 
 %x PARAMS 
 %x LOGOTEXT
-%x LABELTEXT LISTCONTENT
-%x FIGURE TABLE LIST
+%x LABELTEXT
+%x FIGURE TABLE
+%x LIST LISTCONTENT
 
 %%
 
@@ -347,7 +348,7 @@
 <TABLE>. { /* default rule TABLE */ }
 
 
-"["[a-zA-Z0-9 \n\t:|.,<>;/-]+"]{"[a-zA-Z0-9#:;<>!/¡`"@$%&*()_\[\]=+^~\\'.,¿? \n\t-]+"}" {
+"["[a-zA-Z0-9 \n\t:|.,<>;/-]+"]"[ \t\n]*"{"[a-zA-Z0-9#:;<>!/¡`"@$%&*()_\[\]=+^~\\'.,¿? \n\t-]+"}" {
     auto offset = strlen(yytext);
 
     while(yytext[offset] != '[')
@@ -355,6 +356,8 @@
     BEGIN(LIST);
     return makeToken(yytext, yyleng, Token::List);
 }
+
+<LIST>[ \t\n]* { /* support wsp between ] and { */ }
 
 <LIST>[a-zA-Z0-9 \n\t:|.,<>;/-]+ {
     yylval.emplace<std::string>(yytext, yyleng);

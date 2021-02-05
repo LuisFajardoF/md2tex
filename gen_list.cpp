@@ -1,6 +1,8 @@
 #include "gen_list.h"
 
 bool use_enumitem = false;
+bool use_amssymb = false;
+bool use_pifont = false;
 
 /****************** List ******************/
 List::List(std::string*& params, std::string& content) : params(params), content(content)
@@ -21,6 +23,23 @@ void List::fillItemsVector()
         else
             line.push_back(content[it]);
     }
+}
+
+std::string List::getParams()
+{
+    std::string code;
+
+    std::string param2 = trim(params[1]);
+    std::string param3 = trim(params[2]);
+
+    if (param2 != "") {
+        code += "[" + getParamCode(param2);
+        if (param3 != "") 
+            code += "," + getParamCode(param3);
+        code += "]";
+    }
+
+    return code;
 }
 
 std::string List::trim(std::string str)
@@ -50,22 +69,6 @@ std::string OrderedList::getCode()
     return getBegin()
         + getContent()
         + getEnd();
-}
-
-std::string OrderedList::getParams()
-{
-    std::string code;
-
-    std::string param2 = trim(params[1]);
-    std::string param3 = trim(params[2]);
-
-    if (param2 != "")
-        code += "[" + getParamCode(param2);
-    if (param3 != "") 
-        code += "," + getParamCode(param3);
-    if (param2 != "") 
-        code += "]";
-    return code;
 }
 
 std::string OrderedList::getParamCode(std::string& param)
@@ -118,45 +121,6 @@ std::string OrderedList::generateItems()
     return code;
 }
 
-std::string UnorderedList::getParams()
-{
-    std::string code;
-
-    std::string param2 = trim(params[1]);
-    std::string param3 = trim(params[2]);
-
-    if (param2 != "")
-        code += "[" + getParamCode(param2);
-    if (param3 != "") 
-        code += "," + getParamCode(param3);
-    if (param2 != "") 
-        code += "]";
-    return code;
-}
-
-std::string UnorderedList::getParamCode(std::string& param)
-{
-    std::string code;
-
-    if (param == "bullet")
-        code += "label=$\\bullet$";
-    else if (param == "cdot")
-        code += "label=$\\cdot$";
-    else if (param == "diamond")
-        code += "label=$\\diamond$";
-    else if (param == "ast")
-        code += "label=$\\ast$";
-    else if (param == "circ")
-        code += "label=$\\circ$";
-    else if (param == "dash")
-        code += "label=$-$";
-    else if (param == "noitemsep")
-        code += param;
-    else 
-        code += "label=$\\bullet$";
-    return code;
-}
-
 /****************** Unordered List ******************/
 UnorderedList::UnorderedList(std::string*& params, std::string& content) : List(params, content)
 {
@@ -188,6 +152,7 @@ std::string UnorderedList::generateItems()
     std::string out;
 
     for (auto item : items) {
+        item = trim(item);
         if (item[0] == '-' && item[1] == ' ' ||
         item[0] == '+' && item[1] == ' ' ||
         item[0] == '*' && item[1] == ' ' ) {
@@ -200,13 +165,40 @@ std::string UnorderedList::generateItems()
     return out;
 }
 
+std::string UnorderedList::getParamCode(std::string& param)
+{
+    std::string code;
+
+    if (param == "bullet")
+        code += "label=$\\bullet$";
+    else if (param == "cdot")
+        code += "label=$\\cdot$";
+    else if (param == "diamond")
+        code += "label=$\\diamond$";
+    else if (param == "ast")
+        code += "label=$\\ast$";
+    else if (param == "circ")
+        code += "label=$\\circ$";
+    else if (param == "dash")
+        code += "label=$-$";
+    else if (param == "star")
+        code += "label=$\\star$";
+    else if (param == "triangle")
+        code += "label=$\\triangleright$";
+    else if (param == "noitemsep")
+        code += param;
+    else 
+        code += "label=$\\bullet$";
+    return code;
+}
+
 /****************** Description List ******************/
 DescriptionList::DescriptionList(std::string*& params, std::string& content) : List(params, content)
 {
     this->params = params;
     this->content = content;
 
-    setBegin();
+    setBegin(getParams());
     setEnd();
 }
 
@@ -217,7 +209,7 @@ std::string DescriptionList::getCode()
         + getEnd();
 }
 
-void DescriptionList::setBegin() { begin = "\t\\begin{description}\n"; }
+void DescriptionList::setBegin(std::string params) { begin = "\t\\begin{description}" + params + "\n"; }
 void DescriptionList::setEnd() { end = "\t\\end{description}\n"; }
 
 std::string DescriptionList::getContent()
@@ -236,6 +228,78 @@ std::string DescriptionList::generateItems()
         code += "\t\t\\item[" + trim(std::string(token)) + "] ";
         token = strtok(NULL, "\n");
         code += std::string(token) + "\n";
+    }    
+    return code;
+}
+
+std::string DescriptionList::getParamCode(std::string& param)
+{
+    std::string code;
+
+    if (param == "nextline")
+        code += "style=nextline";
+    else if (param == "noitemsep")
+        code += "noitemsep";
+
+    return code;
+}
+
+/****************** ToDo List ******************/
+ToDoList::ToDoList(std::string*& params, std::string& content) : List(params, content)
+{
+    this->params = params;
+    this->content = content;
+
+    use_amssymb = true;
+    use_pifont = true;
+
+    setBegin();
+    setEnd();
+}
+
+std::string ToDoList::getCode()
+{
+    return getBegin()
+        + getContent()
+        + getEnd();
+}
+
+void ToDoList::setBegin()
+{
+    begin = "\t\\begin{itemize}[label=]\n"
+            "\t\t\\item \\begin{todolist}[label=$\\square$]\n";
+}
+
+void ToDoList::setEnd()
+{
+    end = "\t\t\\end{todolist}\n"
+        "\t\\end{itemize}\n";
+}
+
+std::string ToDoList::getContent()
+{
+    fillItemsVector();
+    return generateItems();
+}
+
+std::string ToDoList::generateItems()
+{
+    std::string code;
+    std::string item_cpy;
+
+    for (auto item : items) {
+        item = trim(item);
+        if (item[0] == '-' && item[1] == ' ') {
+            item.erase(0, 1);
+            code += "\t\t\t\\item[\\undone]" + item + "\n";
+        } else if (item[0] == '+' && item[1] == ' ') {
+            item.erase(0, 1);
+            code += "\t\t\t\\item[\\done]" + item + "\n";
+        } else if (item[0] == '*' && item[1] == ' ') {
+            item.erase(0, 1);
+            code += "\t\t\t\\item" + item + "\n";
+        }
+        else code += "\t\t\t" + item + "\n";
     }    
     return code;
 }
@@ -427,7 +491,7 @@ std::string NestedList::getItem(std::string& item, int tabs_off)
 {
     char* token;
 
-    token = strtok(const_cast<char*>(item.c_str()), ".-");
+    token = strtok(const_cast<char*>(item.c_str()), ".-+*");
     token = strtok(NULL, "\n");
     return tabs[tabs_off] + "\\item" + std::string(token) + "\n";
 }

@@ -93,6 +93,8 @@ struct Package
         Colortbl,
         Pgfplotstable,
         Enumitem,
+        Amssymb,
+        Pifont
     };
 
     Package() {}
@@ -111,6 +113,8 @@ struct Package
         {Colortbl, "colortbl"},
         {Pgfplotstable, "pgfplotstable"},
         {Enumitem, "enumitem"},
+        {Amssymb, "amssymb"},
+        {Pifont, "pifont"},
     };
 
     void add(unsigned int pack);
@@ -122,6 +126,7 @@ struct Preamble
     enum 
     {
         Siunitx,
+        ToDoList,
     };
 
     Preamble() {}

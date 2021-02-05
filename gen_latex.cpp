@@ -420,6 +420,9 @@ std::string Code::list(std::string& params, std::string& content)
     } else if (Code::Logic::trim(params_arr[0]) == "description-list") {
         auto d_list(new DescriptionList(params_arr, content));
         code = d_list->getCode();
+    } else if (Code::Logic::trim(params_arr[0]) == "todo-list") {
+        auto c_list(new ToDoList(params_arr, content));
+        code = c_list->getCode();
     }
 
     return code;
