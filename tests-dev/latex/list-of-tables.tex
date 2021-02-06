@@ -1,0 +1,54 @@
+\documentclass{article}
+
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{pgfplotstable}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+\sisetup{
+	round-mode = places,
+	round-precision = 2
+}
+
+\begin{document}
+	\listoftables
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lSS} 
+			\toprule
+			\textbf{    Value 1 } & \textbf{Value 2  } & \textbf{Value 3} \\ \midrule
+			    1       & 1110.10 & 0.00001 \\ 
+			    2       & 10.10   & 0.9090 \\ 
+			    3       & 23.11   & 0.8900 \\ 
+			\bottomrule
+		\end{tabular}
+		\caption{Tabla con unidades alineadas en dos columnas.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every head row/.style={before row=\toprule, after row=\midrule},
+			every last row/.style={after row=\midrule},
+		]{../csv/table1.csv}
+		\caption{Valores aleatorios para la Tabla 1.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			every head row/.style={before row=\toprule, after row=\midrule},
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every even row/.style={after row ={\rowcolor{lime!30}}, before row={\rowcolor{lime!10}}},
+			every last row/.style={after row=\midrule},
+		]{../csv/table2.csv}
+		\caption{Valores aleatorios para la Tabla 2.}
+	\end{table}
+\end{document}

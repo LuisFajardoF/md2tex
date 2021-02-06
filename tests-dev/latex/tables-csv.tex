@@ -1,0 +1,76 @@
+\documentclass{article}
+
+\usepackage{pgfplotstable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+\begin{document}
+
+	\section*{Generaci\'on de tablas con el paquete pgfplotstable}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every head row/.style={before row=\hline},
+			every last row/.style={after row=\hline},
+			every even row/.style={before row=\hline, after row=\hline},
+			every last column/.style={column type/.add={}{|}},
+			every even column/.style={column type/.add={|}{|}}
+		]{../csv/table1.csv}
+		\caption{Valores de Tabla 1.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every head row/.style={before row=\toprule, after row=\midrule},
+			every last row/.style={after row=\midrule},
+		]{../csv/table2.csv}
+		\caption{Valores de Tabla 2.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			every head row/.style={before row=\toprule, after row=\midrule},
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every even row/.style={after row ={\rowcolor{blue!30}}, before row={\rowcolor{blue!10}}},
+			every last row/.style={after row=\midrule},
+		]{../csv/table1.csv}
+		\caption{Valores de Tabla 3.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			every head row/.style={before row=\toprule, after row=\midrule},
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every last row/.style={before row=\midrule, after row=\bottomrule},
+		]{../csv/table3.csv}
+		\caption{Valores de Tabla 4.}
+	\end{table}
+	\newpage
+
+	\begin{table}[h!]
+		\centering
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			every head row/.style={before row=\rowcolor{green!30} \toprule, after row=\midrule},
+			assign column name/.style={/pgfplots/table/column name={\textbf{#1}}},
+			every last row/.style={before row=\rowcolor{green!10} \midrule, after row=\bottomrule},
+		]{../csv/table3.csv}
+		\caption{Valores de Tabla 5.}
+	\end{table}
+\end{document}

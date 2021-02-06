@@ -2,6 +2,11 @@
 
 int main(int argc, char* argv[])
 {
+    if (std::string(argv[1]) == "--version") {
+        std::cout << "v1.2.0" << std::endl;
+        return 0;
+    }
+
     std::ifstream in(argv[1], std::ios::in);    
     std::ofstream out;
     string_t code;

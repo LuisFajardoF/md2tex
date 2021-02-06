@@ -1,3 +1,4 @@
 .vscode
 /build/*
 /latex/*
+/tests-dev/build/*

@@ -9,6 +9,20 @@ void execMD2TEX(const std::string& file_name)
     CHECK (system(cmd.c_str()) == 0);
 }
 
+std::string getOutputCmd(const std::string& cmd)
+{
+    FILE *stream = popen( cmd.c_str(), "r" );
+    REQUIRE (stream != nullptr);
+
+    std::ostringstream ss;
+    char buffer[1024];
+
+    while(fgets(buffer, sizeof(buffer)-1, stream))
+        ss << buffer;
+    
+    return ss.str();
+}
+
 void compareFiles(const std::string& file_name)
 {
     std::ifstream s_file, g_file;
@@ -39,6 +53,11 @@ void compareFiles(const std::string& file_name)
     REQUIRE(s_out != "");
     REQUIRE(g_out != "");       
     CHECK(s_out == g_out);
+}
+
+TEST_CASE("md2tex version")
+{
+    CHECK(getOutputCmd("../md2tex --version") == "v1.2.0\n");
 }
 
 TEST_CASE("plain-text") 
@@ -94,4 +113,24 @@ TEST_CASE("simple-figures")
 TEST_CASE("table-of-contents")
 {
     compareFiles("table-of-contents");
+}
+
+TEST_CASE("tables")
+{
+    compareFiles("tables");
+}
+
+TEST_CASE("tables-csv")
+{
+    compareFiles("tables-csv");
+}
+
+TEST_CASE("list-of-tables")
+{
+    compareFiles("list-of-tables");
+}
+
+TEST_CASE("lists")
+{
+    compareFiles("lists");
 }

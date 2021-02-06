@@ -1,0 +1,187 @@
+\documentclass{article}
+
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{pifont}
+
+%% todolist --> variant of: Joe Corneli
+%% https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
+\newlist{todolist}{itemize}{1}
+\newcommand{\done}{\rlap{$\square$}{\large\hspace{1pt}\ding{51}}\hspace{-2.5pt}}
+\newcommand{\undone}{\rlap{$\square$}{\large\hspace{1pt}\ding{55}}}
+
+\begin{document}
+
+	\section*{Unordered List}
+
+	\subsection*{default}
+	\begin{itemize}
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: ast }
+	\begin{itemize}[label=$\ast$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: cdot }
+	\begin{itemize}[label=$\cdot$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: circ }
+	\begin{itemize}[label=$\circ$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: dash }
+	\begin{itemize}[label=$-$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: diamond }
+	\begin{itemize}[label=$\diamond$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: star }
+	\begin{itemize}[label=$\star$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: triangle }
+	\begin{itemize}[label=$\triangleright$]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+
+	\subsection*{label: bullet \textit{(default)} and noitemsep }
+	\begin{itemize}[label=$\bullet$,noitemsep]
+		\item item1
+		\item item2
+		\item item3
+	\end{itemize}
+	\newpage
+
+	\section*{Ordered List}
+
+	\subsection*{default}
+	\begin{enumerate} 
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+
+	\subsection*{label: alph}
+	\begin{enumerate} [label=\alph*.]
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+
+	\subsection*{label: Alph}
+	\begin{enumerate} [label=\Alph*.]
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+
+	\subsection*{label: roman}
+	\begin{enumerate} [label=\roman*.]
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+
+	\subsection*{label: Roman}
+	\begin{enumerate} [label=\Roman*.]
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+
+	\subsection*{label: arabic \textit{(default)} and noitemsep}
+	\begin{enumerate} [label=\arabic*.,noitemsep]
+		\item item1
+		\item item2
+		\item item3
+	\end{enumerate}
+	\newpage
+
+	\section*{Nested List}
+
+	\subsection*{Soporta 6 niveles}
+
+	\paragraph{Los primeros 4 adoptan el entorno \textit{enumerate} y los \'ultimos 2 adoptan el entorno \textit{itemize}}
+
+	\paragraph{El primer nivel debe comenzar al inicio de la l\'inea y los subniveles deben \'ir separados por 4 espacios o un tab.}
+
+	\subparagraph{No se soportan bloques de texto dentro de los items en este tipo de lista.}
+	\begin{enumerate}
+		\item Level 1
+		\begin{enumerate}
+			\item Level 2
+			\begin{enumerate}
+				\item Level 3
+				\begin{enumerate}
+					\item Level 4
+					\begin{itemize}
+						\item Level 5
+						\begin{itemize}
+							\item Level 6
+							\item Level 6
+						\end{itemize}
+						\item Level 5
+					\end{itemize}
+					\item Level 4
+				\end{enumerate}
+				\item Level 3
+			\end{enumerate}
+			\item Level 2
+		\end{enumerate}
+		\item Level 1
+	\end{enumerate}
+	\newpage
+
+	\section*{Description List}
+
+	\subsection*{default description list}
+	\begin{description}
+		\item[First]  Item 1
+		\item[Second]  Item 2
+		\item[Third]  Item 3
+	\end{description}
+
+	\subsection*{\textit{description list} param: noitemsep}
+	\begin{description}[noitemsep]
+		\item[First]  Item 1
+		\item[Second]  Item 2
+		\item[Third]  Item 3
+	\end{description}
+
+	\section*{ToDo List}
+	\begin{itemize}[label=]
+		\item \begin{todolist}[label=$\square$]
+			\item[\undone] item1
+			\item[\done] item2
+			\item item3
+			\item[\done] item4
+			\item[\undone] item5
+		\end{todolist}
+	\end{itemize}
+\end{document}

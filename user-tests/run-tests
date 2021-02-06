@@ -14,9 +14,9 @@ pass_counter=""
 fail_counter=""
 
 folders_one_compilation=(plain-text emphasis-text headers numbered-headers pagenumbering simple-figures \
-       multiple-figures cover-default cover-report)
+       multiple-figures cover-default cover-report tables tables-csv lists)
 
-folders_two_compilation=(table-of-contents list-of-figures)
+folders_two_compilation=(table-of-contents list-of-figures list-of-tables)
 
 pass_counter=$((0))
 fail_counter=$((0))

@@ -1,0 +1,74 @@
+\documentclass{article}
+
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+\sisetup{
+	round-mode = places,
+	round-precision = 2
+}
+
+\begin{document}
+
+	\section*{Generaci\'on de tablas con el entorno tabular}
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|l|l|c|} \hline
+			\textbf{    column 1} & \textbf{column 2 } & \textbf{column 3} \\ \hline
+			    abc     & def     & ghi     \\ \hline
+			    123     & 456     & 789     \\ \hline
+			    987     & 654     & 321     \\ \hline
+			    9.87    & 6.54    & 3.21     \\ \hline
+			    68.7    & 65.4    & 32.1     \\ \hline
+			    jkl     & mno     & pqr \\ \hline
+			            & xyz     & abc     \\ \hline
+		\end{tabular}
+		\caption{Tabla 1}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lSrc} 
+			\toprule
+			\textbf{    Value 1 } & \textbf{Value 2  } & \textbf{Value 3} & \textbf{ Value 4} \\ \midrule \rowcolor{green!10}
+			    1       & 1110.10 & a     & 0.1 \\ \rowcolor{green!30}
+			    2       & 10.10   & b     & 0.01 \\ \rowcolor{green!10}
+			    3       & 23.11   & c     & 0.001 \\ \rowcolor{green!30}
+			    4       & 233.18  & d     & 0.0001 \\ \rowcolor{green!10}
+			    5       & 963.36  & e     & 0.00001 \\ \rowcolor{green!30}
+			    6       & 113.36  & f     & 0.000001 \\ 
+			\bottomrule
+		\end{tabular}
+		\caption{Tabla con unidades alineadas.}
+	\end{table}
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lSS} 
+			\toprule
+			\textbf{    Value 1 } & \textbf{Value 2  } & \textbf{Value 3} \\ \midrule
+			    1       & 1110.10 & 0.00001 \\ 
+			    2       & 10.10   & 0.9090 \\ 
+			    3       & 23.11   & 0.8900 \\ 
+			\bottomrule
+		\end{tabular}
+		\caption{Tabla con unidades alineadas en dos columnas.}
+	\end{table}
+	\newpage
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{lSS} 
+			\toprule \rowcolor{olive!30}
+			\textbf{    Value 1 } & \textbf{Value 2  } & \textbf{Value 3} \\ \midrule 
+			    1       & 1110.10 & 0.00001 \\ 
+			    2       & 10.10   & 0.9090 \\ \midrule \rowcolor{olive!10}
+			    3       & 23.11   & 0.8900 \\ 
+			\bottomrule
+		\end{tabular}
+		\caption{Tabla con unidades alineadas en dos columnas.}
+	\end{table}
+\end{document}
