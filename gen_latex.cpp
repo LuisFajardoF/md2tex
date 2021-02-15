@@ -428,6 +428,13 @@ std::string Code::list(std::string& params, std::string& content)
     return code;
 }
 
+// Bibliography
+std::string Code::bibliography(std::string& content)
+{
+    auto bib(new Bibliography(content));
+    return bib->getCode();
+}
+
 // Code::Logic namespace
 std::string Code::Logic::options(std::string param)
 {

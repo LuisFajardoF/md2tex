@@ -36,6 +36,7 @@ namespace AuxFuncs
 {
     void specialLatexCommands(char character, std::string& text, int& offset);
     bool emphasisCommands(std::string& text, int& offset, bool& is_emphasis);
+    void citationCommand(std::string& text, int& offset);
     void analyzeText(std::string& text);
 }
 

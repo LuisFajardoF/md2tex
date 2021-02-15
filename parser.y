@@ -79,6 +79,9 @@ namespace Expr {
 %token<std::string> ClosePar ")"
 %token<std::string> Comma ","
 %token<std::string> Semicolon ";"
+%token<std::string> OpenBib "```bib"
+%token<std::string> CloseBib "bib```" // para diferenciar de otros tipos de cierre
+%token<std::string> BibContent "bibContent"
 %token<std::string> Error
 %token Eof 0 "EoF"
 
@@ -143,6 +146,9 @@ element: "h1" "text" {
     }
     | "list" "listParams" "]" "{" "listContent" "}" {
         $$ = new Ast::List($2, $5);
+    }
+    | "```bib" "bibContent" "bib```" {
+        $$ = new Ast::Bibliography($2);
     }
     | "newpage" {
         $$ = new Ast::NewPage();

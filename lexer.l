@@ -22,6 +22,7 @@
 %x LABELTEXT
 %x FIGURE TABLE
 %x LIST LISTCONTENT
+%x BIB
 
 %%
 
@@ -261,6 +262,21 @@
     BEGIN(TEXT);
 }
 
+"```bib" {
+    BEGIN(BIB);
+    return makeToken(yytext, yyleng, Token::OpenBib);
+}
+
+<BIB>[a-zA-Z0-9 \n\t:|.,<>;/{}\[\]()-]+ {
+    yylval.emplace<std::string>(yytext, yyleng);
+    return makeToken(yytext, yyleng, Token::BibContent);
+}
+
+<BIB>"```" {
+    BEGIN(INITIAL);
+    return makeToken(yytext, yyleng, Token::CloseBib);
+}
+
 "!["[a-zA-Z0-9 ,;.:={}\n]+"]("[a-zA-Z0-9_.:/ -,\n]+")" {
     auto offset = strlen(yytext);
 
@@ -314,7 +330,7 @@
 
 <FIGURE>. { /* default rule FIGURE */ }
 
-"!["[a-zA-Z0-9 \n\t:|.<>;/-]+"]{"[a-zA-Z0-9 \n\t:|.<>/-]+"}" {
+"!["[a-zA-Z0-9 \n\t:|.<>;/-]+"]"[ \t\n]*"{"[a-zA-Z0-9 \n\t:|.<>/-]+"}" {
     auto offset = strlen(yytext);
 
     while(yytext[offset] != '!')
@@ -322,6 +338,8 @@
     BEGIN(TABLE);
     return makeToken(yytext, yyleng, Token::Table); 
 }
+
+<TABLE>[ \t\n]* { /*** support wsp between ] and { ***/ }
 
 <TABLE>[a-zA-Z0-9 \n\t:|.<>;/-]+ {
     yylval.emplace<std::string>(yytext, yyleng);
@@ -357,7 +375,7 @@
     return makeToken(yytext, yyleng, Token::List);
 }
 
-<LIST>[ \t\n]* { /* support wsp between ] and { */ }
+<LIST>[ \t\n]* { /*** support wsp between ] and { ***/ }
 
 <LIST>[a-zA-Z0-9 \n\t:|.,<>;/-]+ {
     yylval.emplace<std::string>(yytext, yyleng);
@@ -448,6 +466,9 @@
             break;
             case '\\':
                 AuxFuncs::specialLatexCommands('\\', text, offset);
+            break;
+            case '[':
+                AuxFuncs::citationCommand(text, offset);
             break;
             default:
                 break;
@@ -628,4 +649,20 @@ void AuxFuncs::analyzeText(std::string& text)
 
         offset++;
     }
+}
+
+void AuxFuncs::citationCommand(std::string& text, int& offset)
+{
+    std::string citation;
+    auto off_copy = offset;
+
+    while (text[++off_copy] != ']') {
+        if (isdigit(text[off_copy]))
+            citation.push_back(text[off_copy]);
+        else return;
+    }
+    
+    text.replace(offset, (citation.length()+2), "");
+    text.insert(offset, "\\cite{" + citation + "}");
+    offset += ("\\cite{" + citation + "}").length();
 }

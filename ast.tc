@@ -85,6 +85,7 @@
 %node LoT Element = { string_t text; }
 %node DepthParam Element = { string_t text; }
 %node SpacingParam Element = { string_t text; }
+%node Bibliography Element = { string_t content; }
 
 %node Figure Element = {
     FigureParams* params;
@@ -406,4 +407,9 @@ genLatex(SpacingParam) {
 
     // single, onehalf, double
     return Code::tocSpacingParam(text);
+}
+
+genLatex(Bibliography) {
+    // std::cout << content << std::endl;
+    return Code::bibliography(content);
 }

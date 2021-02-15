@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}  ast.cpp
                             gen_latex.cpp
                             gen_table.cpp
                             gen_list.cpp
+                            gen_bib.cpp
                             parser.cpp
                             lexer.cpp
                             main.cpp)

@@ -11,6 +11,7 @@
 
 #include "gen_table.h"
 #include "gen_list.h"
+#include "gen_bib.h"
 
 namespace Code 
 {
@@ -46,6 +47,7 @@ namespace Code
     std::string tocDepthParam(int depth);
     std::string table(std::string& params, std::string& content);
     std::string list(std::string& params, std::string& content);
+    std::string bibliography(std::string& content);
     
     // report cover
     std::string reportCoverLogo(std::string& text);

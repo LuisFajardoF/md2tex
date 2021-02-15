@@ -1,5 +1,7 @@
 #include "main.h"
 
+bool dev_mode;
+
 int main(int argc, char* argv[])
 {
     if (std::string(argv[1]) == "--version") {
@@ -71,8 +73,12 @@ void createLatexFolders()
 
 void flagEval(std::string flag)
 {
-    if (flag == "--dev")
+    if (flag == "--dev") {
         createLatexFoldersDev();
-    else 
-        createLatexFolders();
+        dev_mode = true;
+    }
+    else {
+        createLatexFolders(); 
+        dev_mode = false;
+    }
 }
