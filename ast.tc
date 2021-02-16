@@ -25,6 +25,7 @@
     bool latexclass_exist = false;
     bool is_numbered = false;
     bool is_reportcover = false;
+    bool is_bibliography = false;
 
     struct Package package;
     struct Preamble preamble;
@@ -85,6 +86,7 @@
 %node LoT Element = { string_t text; }
 %node DepthParam Element = { string_t text; }
 %node SpacingParam Element = { string_t text; }
+%node BibStyle Element = { string_t text; }
 %node Bibliography Element = { string_t content; }
 
 %node Figure Element = {
@@ -409,7 +411,46 @@ genLatex(SpacingParam) {
     return Code::tocSpacingParam(text);
 }
 
+genLatex(BibStyle) {
+    is_bibliography = true;
+    text = Code::Logic::trim(text);
+
+    if (text == "b-alphabetic") text = "alphabetic";
+    else if (text == "b-authoryear") text = "authoryear";
+    else if (text == "b-authortitle") text = "authortitle";
+    else if (text == "b-authoryear-icomp") text = "authoryear-icomp";
+
+    StringVector bibStyleVec = {
+        "numeric", "alphabetic", "authoryear", "authortitle", "verbose", 
+        "reading", "draft", "authoryear-icomp", "apa", "bwl-FU", "chem-acs", 
+        "chem-angew", "chem-biochem", "chem-rsc", "ieee", "musuos", "nature", 
+        "nejm", "phys", "science", "geschichtsfrkl", "oscola"
+    };
+
+    StringVector::iterator it;
+    it = std::find(bibStyleVec.begin(), bibStyleVec.end(), text);
+    if (it == bibStyleVec.end())
+        text = "numeric";
+
+    preamble.code.insert({
+        Preamble::Biblatex,
+        "\\usepackage[backend=biber,style=" + text + "]{biblatex}\n"
+        "\\bibliography{../bib/bibliography}\n\n"
+    });
+    preamble.add(Preamble::Biblatex);
+    return code;
+}
+
 genLatex(Bibliography) {
-    // std::cout << content << std::endl;
-    return Code::bibliography(content);
+    if (!is_bibliography) {
+        preamble.code.insert({
+            Preamble::Biblatex,
+            "\\usepackage[backend=biber]{biblatex}\n"
+            "\\bibliography{../bib/bibliography}\n\n"
+        });
+        preamble.add(Preamble::Biblatex);
+        is_bibliography = true;
+    }
+    Code::bibliography(content);
+    return code;
 }

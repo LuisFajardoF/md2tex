@@ -17,7 +17,10 @@ std::string Code::beginDocument()
 
 std::string Code::endDocument()
 {
-    return "\\end{document}";
+    std::string code = "\\end{document}";
+    if (is_bibliography)
+        code = "\t\\newpage\n\t\\printbibliography\n" + code;
+    return code;
 }
 
 std::string Code::section(std::string& text, bool is_numbered)
@@ -429,10 +432,9 @@ std::string Code::list(std::string& params, std::string& content)
 }
 
 // Bibliography
-std::string Code::bibliography(std::string& content)
+void Code::bibliography(std::string& content)
 {
-    auto bib(new Bibliography(content));
-    return bib->getCode();
+    new Bibliography(content);
 }
 
 // Code::Logic namespace

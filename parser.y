@@ -81,6 +81,7 @@ namespace Expr {
 %token<std::string> Semicolon ";"
 %token<std::string> OpenBib "```bib"
 %token<std::string> CloseBib "bib```" // para diferenciar de otros tipos de cierre
+%token<std::string> BibStyle "bibStyle"
 %token<std::string> BibContent "bibContent"
 %token<std::string> Error
 %token Eof 0 "EoF"
@@ -201,6 +202,9 @@ param_level1: "cover" ":" "default" "{" param_level2_list "}" {
     }
     | "lot" ":" "text" {
         $$ = new Ast::LoT($3);
+    }
+    | "bibStyle" ":" "text" {
+        $$ = new Ast::BibStyle($3);
     }
 ;
 

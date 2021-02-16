@@ -262,6 +262,12 @@
     BEGIN(TEXT);
 }
 
+"bibstyle" {
+    if (is_param)
+        return makeToken(yytext, yyleng, Token::BibStyle);
+    BEGIN(TEXT);
+}   
+
 "```bib" {
     BEGIN(BIB);
     return makeToken(yytext, yyleng, Token::OpenBib);

@@ -5,7 +5,7 @@ bool dev_mode;
 int main(int argc, char* argv[])
 {
     if (std::string(argv[1]) == "--version") {
-        std::cout << "v1.2.0" << std::endl;
+        std::cout << "v1.3.0" << std::endl;
         return 0;
     }
 

@@ -4,24 +4,26 @@ Bibliography::Bibliography(std::string& content)
 {
     this->content = content;
     getBibData();
-    print();
+    bib_path = dev_mode? "../latex/bib" : "latex/bib"; 
+    mkdir(bib_path.c_str(), S_IRWXU);
+    genBib();
 }
 
-std::string Bibliography::getCode() { return code; }
-
-void Bibliography::print()
+std::string Bibliography::getCode() 
 {
+    std::string code;
     for (auto bd : bibDataVector) {
-        std::cout << "key: " << bd.key << " doc. kind: " << bd.document_kind << std::endl;
-        for (auto iv : bd.info_values)
-            std::cout << "field: " << iv.first << " value: " << iv.second << std::endl;
+        code += bd.getBibCode();
     }
+    return code;
 }
 
 void Bibliography::getBibData()
 {
     auto offset = 0;
     std::vector<std::string> values;
+    InfoValues infoValues;
+    std::string key, kind, info_values;
 
     while (content[offset]) {
         if (content[offset] == '[') {
@@ -30,23 +32,41 @@ void Bibliography::getBibData()
         }
         if (content[offset] == ':') {
             while (content[++offset] != '{')
-                document_kind.push_back(content[offset]);
+                kind.push_back(content[offset]);
             while (content[++offset] != '}')
                 info_values.push_back(content[offset]);
             
             key = trim(key);
-            document_kind = trim(document_kind);
-            values = getBibValues();
-            bibDataVector.push_back(BibData(key, document_kind, values));
+            kind = trim(kind);
+            values = getBibValues(info_values);
+            infoValues = getInfoValues(values);
+            bibDataVector.push_back(BibData(key, kind, infoValues));
             key.clear();
-            document_kind.clear();
+            kind.clear();
             info_values.clear();
         }
         offset++;
     }
 }
 
-std::vector<std::string> Bibliography::getBibValues()
+InfoValues Bibliography::getInfoValues(std::vector<std::string>& values)
+{
+    InfoValues infoValues;
+    char* token;
+    std::string field, value;
+
+    for (auto val : values) {
+        token = strtok(const_cast<char*>(val.c_str()), ":");
+        field = trim(std::string(token));
+        token = strtok(NULL, "\n");
+        value = trim(std::string(token));
+        infoValues.push_back({field, value});
+    }
+
+    return infoValues;
+}
+
+std::vector<std::string> Bibliography::getBibValues(std::string& info_values)
 {
     std::string line;
     std::vector<std::string> values;
@@ -61,30 +81,39 @@ std::vector<std::string> Bibliography::getBibValues()
     return values;
 }
 
-/****************** BibData ******************/
-
-BibData::BibData(std::string& key, std::string& document_kind, std::vector<std::string>& values)
+void Bibliography::genBib()
 {
-    this->key = key;
-    this->document_kind = document_kind;
-    this->values = values;
+    std::ofstream file(bib_path +"/bibliography.bib", std::ios::out);
 
-    getInfoValues();
+    if (file.is_open())
+        file << getCode();
+    else
+        std::cerr << "the file could not be opened" << std::endl; 
+    file.close();
 }
 
-void BibData::getInfoValues()
-{
-    char* token;
-    std::string field;
-    std::string value;
+/****************** BibData ******************/
 
-    for (auto val : values) {
-        token = strtok(const_cast<char*>(val.c_str()), ":");
-        field = trim(std::string(token));
-        token = strtok(NULL, "\n");
-        value = trim(std::string(token));
-        info_values.push_back({field, value});
+BibData::BibData(std::string& key, std::string& kind, InfoValues& infoValues)
+{
+    this->key = key;
+    this->kind = kind;
+    this->infoValues = infoValues;
+}
+
+std::string BibData::getBibCode()
+{
+    std::string code;
+    std::transform(kind.begin(), kind.end(), kind.begin(), ::toupper);
+    code += "@" + kind + " {\n"
+        "\t" + key + ",\n"; 
+
+    for (auto iv: infoValues) {
+        std::transform(iv.first.begin(), iv.first.end(), iv.first.begin(), ::toupper);
+        code += "\t" + iv.first + " = \"" + iv.second + "\",\n";
     }
+    code += "}\n\n";
+    return code;
 }
 
 /**************** trim function *************/
