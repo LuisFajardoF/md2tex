@@ -16,17 +16,17 @@ fail_counter=""
 folders_one_compilation=(plain-text emphasis-text headers numbered-headers pagenumbering simple-figures \
        multiple-figures cover-default cover-report tables tables-csv lists)
 
-folders_two_compilation=(table-of-contents list-of-figures list-of-tables)
+folders_two_compilation=(table-of-contents list-of-figures list-of-tables bibliography)
 
 pass_counter=$((0))
 fail_counter=$((0))
 
-echo "paquetes LaTeX requeridos por md2tex..."
-if ./chktex $1; then
-    echo "todos los paquetes requeridos estan instalados en su sistema..."
-else
-    echo -e "para instalar los paquetes faltantes, ejecute: \e[1;33mtlmgr install <package>\e[0m o configure los paquetes manualmente"
-fi
+#echo "paquetes LaTeX requeridos por md2tex..."
+#if ./chktex $1; then
+#    echo "todos los paquetes requeridos estan instalados en su sistema..."
+#else
+#    echo -e "para instalar los paquetes faltantes, ejecute: \e[1;33mtlmgr install <package>\e[0m o configure los paquetes manualmente"
+#fi
 sleep 1
 
 # tests que requieren solo una compilacion
@@ -84,6 +84,11 @@ for folder in "${folders_two_compilation[@]}"; do
     mkdir -p output
     # para crear archivos auxiliares: toc, lof, lot...
     pdflatex --interaction=batchmode --output-directory=output $folder.tex
+
+    # para ejecutar biber
+    if [ $folder == "bibliography" ]; then
+        biber $folder --onlylog --output-directory output
+    fi
 
     if pdflatex --interaction=batchmode --output-directory=output $folder.tex; then
         echo -e $PASS

@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sys/stat.h>
 #include "lexer.h"
-#include "ast.h"
 
 std::string dev_arg = "";
 

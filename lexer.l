@@ -9,7 +9,7 @@
             std::istream *in = yyget_extra(yyscanner); \
             in->read(buffer, max_size); \
             result = in->gcount(); \
-        } while(false)
+        } while(0)
     
     bool is_param = false;
     bool is_image_path = false; // activa la regla [a-zA-Z0-9_.-/] para el path de imagenes

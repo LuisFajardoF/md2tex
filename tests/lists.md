@@ -2,9 +2,9 @@
 
 ## default
 [unordered-list]{
-- item1
-- item2
-- item3
+    - item1
+    - item2
+    - item3
 }
 
 ## label: ast 
@@ -16,9 +16,9 @@
 
 ## label: cdot 
 [unordered-list; cdot]{
-* item1
-* item2
-* item3
+    * item1
+    * item2
+    * item3
 }
 
 ## label: circ 
@@ -152,7 +152,7 @@
 }
 
 # ToDo List
-[todo-list] {
+[todo-list; noitemsep] {
     - item1
     + item2
     * item3
